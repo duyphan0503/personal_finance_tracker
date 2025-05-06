@@ -30,6 +30,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  supabase_flutter: ^2.9.0
+  flutter_bloc: ^9.1.1
+  flutter_secure_storage: ^9.2.4
+  fl_chart: ^0.71.0
+  flutter_datetime_picker_plus: ^2.2.0
+  equatable: ^2.0.7
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -38,6 +44,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner: ^2.4.15
+  flutter_gen_runner: ^5.10.0
+  injectable_generator: ^2.7.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

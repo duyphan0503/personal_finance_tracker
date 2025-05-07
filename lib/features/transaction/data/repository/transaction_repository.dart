@@ -1,6 +1,9 @@
+import 'package:injectable/injectable.dart';
+
 import '../../model/transaction_model.dart';
 import '../datasources/transaction_remote_datasource.dart';
 
+@lazySingleton
 class TransactionRepository {
   final TransactionRemoteDataSource remoteDataSource;
 

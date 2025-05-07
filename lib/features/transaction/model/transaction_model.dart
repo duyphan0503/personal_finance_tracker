@@ -1,5 +1,8 @@
+import 'package:injectable/injectable.dart';
+
 import '../../budget/model/category_model.dart';
 
+@injectable
 class TransactionModel {
   final String id;
   final String userId;

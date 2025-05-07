@@ -1,6 +1,9 @@
-import 'package:personal_finance_tracker/features/tracsaction/model/transaction_model.dart';
+import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../model/transaction_model.dart';
+
+@lazySingleton
 class TransactionRemoteDataSource {
   final SupabaseClient _client;
 

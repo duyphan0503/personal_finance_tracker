@@ -1,11 +1,13 @@
-import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:personal_finance_tracker/features/tracsaction/data/repository/transaction_repository.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 
+import '../data/repository/transaction_repository.dart';
 import '../model/transaction_model.dart';
 
 part 'transaction_state.dart';
 
+@injectable
 class TransactionCubit extends Cubit<TransactionState> {
   final TransactionRepository _repository;
 

@@ -1,5 +1,4 @@
-final String baseUrl = "https://sepjbbfxdkrbnzuiczhc.supabase.co";
-final String apiKey ="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNlcGpiYmZ4ZGtyYm56dWljemhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNDQ1MTgsImV4cCI6MjA2MDgyMDUxOH0.tA-ZWseTlYY637UehB2U3L4MItSACYZfBzUF_oAPDqs";
-final String authUrl = "$baseUrl/auth/v1";
-
-
+const String supUrl = "https://vfektukxknrbsnjazubh.supabase.co";
+const String supApiKey =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmZWt0dWt4a25yYnNuamF6dWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0NTc3NTcsImV4cCI6MjA2MjAzMzc1N30.7UEJ8sbFqlYOQAptqpuBH8Xx4HLCu0WmjuTtEa32AuY";
+const String authUrl = "$supUrl/auth/v1";

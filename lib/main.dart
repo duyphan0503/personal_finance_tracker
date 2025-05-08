@@ -1,23 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/app.dart';
+import 'package:personal_finance_tracker/features/transaction/cubit/transaction_cubit.dart';
+import 'package:personal_finance_tracker/features/transaction/data/datasources/transaction_remote_datasource.dart';
+import 'package:personal_finance_tracker/features/transaction/data/repository/transaction_repository.dart';
+import 'package:personal_finance_tracker/injection.dart';
 
-import 'features/budget/view/budget_view.dart';
+import 'config/supabase_config.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  await initSupabase();
+  configureDependencies();
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Budget App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: BudgetView(), // <-- Đổi từ MyHomePage sang BudgetView
-    );
-  }
+  runApp(const PersonalFinanceTrackerApp());
 }

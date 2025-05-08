@@ -1,0 +1,214 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:personal_finance_tracker/shared/services/notification_service.dart';
+import 'package:personal_finance_tracker/shared/widgets/budget/category_dropdown.dart';
+import '../../category/model/category_model.dart';
+import '../cubit/budget_cubit.dart';
+
+class BudgetScreen extends StatefulWidget {
+  const BudgetScreen({super.key});
+
+  @override
+  State<BudgetScreen> createState() => _BudgetScreenState();
+}
+
+class _BudgetScreenState extends State<BudgetScreen> {
+  final TextEditingController _budgetController = TextEditingController();
+  CategoryModel? _selectedCategory;
+
+  @override
+  void initState() {
+    super.initState();
+    _budgetController.addListener(_updateBudgetDisplay);
+    context.read<BudgetCubit>().fetchCategories();
+  }
+
+  @override
+  void dispose() {
+    _budgetController.removeListener(_updateBudgetDisplay);
+    _budgetController.dispose();
+    super.dispose();
+  }
+
+  void _updateBudgetDisplay() => setState(() {});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text(
+          'Set Budget',
+          style: TextStyle(
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
+      ),
+      body: BlocConsumer<BudgetCubit, BudgetState>(
+        listener: (context, state) {
+          if (state is BudgetError) {
+            NotificationService.showError(state.message);
+          } else if (state is BudgetSaved) {
+            NotificationService.showSuccess('Budget saved successfully!');
+            _budgetController.clear();
+            setState(() => _selectedCategory = null);
+          }
+        },
+        builder: (context, state) {
+          return Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Amount Display
+                Center(
+                  child: Text(
+                      _budgetController.text.isEmpty
+                          ? '\$0'
+                          : '\$${_formatCurrency(_budgetController.text)}',
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      )),
+                ),
+                const SizedBox(height: 32),
+
+                // Category Dropdown
+                const Text(
+                  'Budget Category',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                if (state is BudgetLoading)
+                  const Center(child: CircularProgressIndicator())
+                else if (state is BudgetLoaded)
+                  CategoryDropdown(
+                    categories: state.categories,
+                    onChanged: (category) {
+                      setState(() => _selectedCategory = category);
+                    },
+                    selectedCategory: _selectedCategory,
+                  )
+                else if (state is BudgetError)
+                    Text(
+                      'Error: ${state.message}',
+                      style: const TextStyle(color: Colors.red),
+                    ),
+
+                const SizedBox(height: 24),
+
+                // Monthly Budget Input
+                const Text(
+                  'Monthly Budget',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _budgetController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    prefixText: '\$',
+                    hintText: '2,500',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Colors.grey),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 14),
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                  ),
+                  onChanged: (value) => _formatCurrencyInput(value),
+                ),
+                const SizedBox(height: 32),
+
+                // Save Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: state is BudgetSaving ? null : _saveBudget,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFFF6B00), // Màu cam
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: state is BudgetSaving
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                      'Save',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  String _formatCurrency(String value) {
+    final number = double.tryParse(value.replaceAll(',', '')) ?? 0;
+    return number.toStringAsFixed(0).replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+    );
+  }
+
+  void _formatCurrencyInput(String value) {
+    final cleanValue = value.replaceAll(RegExp(r'[^0-9]'), '');
+    if (cleanValue.isEmpty) {
+      _budgetController.text = '';
+      return;
+    }
+    final number = int.tryParse(cleanValue) ?? 0;
+    final formatted = number.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+    );
+    if (formatted != _budgetController.text) {
+      _budgetController.value = TextEditingValue(
+        text: formatted,
+        selection: TextSelection.collapsed(offset: formatted.length),
+      );
+    }
+  }
+
+  void _saveBudget() {
+    if (_selectedCategory == null) {
+      NotificationService.showError('Please select a category');
+      return;
+    }
+
+    final cleanAmount = _budgetController.text.replaceAll(',', '');
+    final amount = double.tryParse(cleanAmount);
+
+    if (amount == null || amount <= 0) {
+      NotificationService.showError('Please enter a valid amount');
+      return;
+    }
+
+    context.read<BudgetCubit>().saveBudget(amount, _selectedCategory!.id);
+  }
+}

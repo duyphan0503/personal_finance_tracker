@@ -11,10 +11,12 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
-import 'package:personal_finance_tracker/features/budget/cubit/budget_cubit.dart'
-    as _i540;
+import 'package:personal_finance_tracker/features/budget/model/budget_model.dart'
+    as _i755;
 import 'package:personal_finance_tracker/features/budget/model/category_model.dart'
     as _i824;
+import 'package:personal_finance_tracker/features/category/model/category_model.dart'
+    as _i800;
 import 'package:personal_finance_tracker/features/transaction/cubit/transaction_cubit.dart'
     as _i716;
 import 'package:personal_finance_tracker/features/transaction/data/datasources/transaction_remote_datasource.dart'
@@ -27,6 +29,11 @@ import 'package:personal_finance_tracker/register_supabase_module.dart'
     as _i906;
 import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
+import 'features/budget/cubit/budget_cubit.dart';
+import 'features/budget/data/datasources/budget_remote_datasource.dart';
+import 'features/budget/data/repository/budget_repository.dart';
+import 'features/category/data/datasources/category_remote_datasource.dart';
+
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
   _i174.GetIt init({
@@ -35,12 +42,26 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerSupabaseModule = _$RegisterSupabaseModule();
-    gh.factory<_i540.BudgetCubit>(() => _i540.BudgetCubit());
     gh.lazySingleton<_i454.SupabaseClient>(
       () => registerSupabaseModule.supabaseClient,
     );
+    gh.lazySingleton<BudgetRemoteDataSource>(
+      () => BudgetRemoteDataSource(gh<_i454.SupabaseClient>()),
+    );
     gh.lazySingleton<_i114.TransactionRemoteDataSource>(
       () => _i114.TransactionRemoteDataSource(gh<_i454.SupabaseClient>()),
+    );
+    gh.lazySingleton<CategoryRemoteDataSource>(
+      () => CategoryRemoteDataSource(gh<_i454.SupabaseClient>()),
+    );
+    gh.factory<_i800.CategoryModel>(
+      () => _i800.CategoryModel(
+        id: gh<String>(),
+        name: gh<String>(),
+        type: gh<_i800.CategoryType>(),
+        createdAt: gh<DateTime>(),
+        updatedAt: gh<DateTime>(),
+      ),
     );
     gh.lazySingleton<_i1067.TransactionRepository>(
       () =>
@@ -58,9 +79,23 @@ extension GetItInjectableX on _i174.GetIt {
         createdAt: gh<DateTime>(),
       ),
     );
+    gh.factory<BudgetRepository>(
+      () => BudgetRepository(gh<BudgetRemoteDataSource>()),
+    );
+    gh.factory<_i755.BudgetModel>(
+      () => _i755.BudgetModel(
+        id: gh<String>(),
+        categoryId: gh<String>(),
+        amount: gh<double>(),
+        createdAt: gh<DateTime>(),
+        updatedAt: gh<DateTime>(),
+        category: gh<_i800.CategoryModel>(),
+      ),
+    );
     gh.factory<_i716.TransactionCubit>(
       () => _i716.TransactionCubit(gh<_i1067.TransactionRepository>()),
     );
+    gh.factory<BudgetCubit>(() => BudgetCubit(gh<BudgetRepository>()));
     return this;
   }
 }

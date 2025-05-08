@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:personal_finance_tracker/features/budget/view/budget_view.dart';
+import 'package:personal_finance_tracker/features/budget/view/budget_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/transaction_history_screen.dart';
 
 class AppRoutes {
@@ -48,7 +48,7 @@ class AppRoutes {
       GoRoute(
         path: budget,
         name: 'budget',
-        builder: (context, state) =>  BudgetView(),
+        builder: (context, state) =>  BudgetScreen(),
       ),
     ],
     // Optional error handler for invalid routes

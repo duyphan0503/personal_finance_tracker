@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:personal_finance_tracker/features/report/cubit/report_summary_cubit.dart';
 import 'package:personal_finance_tracker/features/transaction/cubit/transaction_cubit.dart';
 import 'package:personal_finance_tracker/injection.dart';
 import 'package:personal_finance_tracker/routes/app_routes.dart';
@@ -20,6 +21,7 @@ class _PersonalFinanceTrackerAppState extends State<PersonalFinanceTrackerApp> {
     return MultiBlocProvider(providers: [
       BlocProvider<TransactionCubit>(create: (_) => getIt<TransactionCubit>()),
       BlocProvider<BudgetCubit>(create: (_) => getIt<BudgetCubit>()),
+      BlocProvider<ReportSummaryCubit>(create: (_) => getIt<ReportSummaryCubit>()),
     ], child: MaterialApp.router(
       title: 'Personal Finance Tracker',
       theme: ThemeData(

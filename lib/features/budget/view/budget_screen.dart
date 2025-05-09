@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart';
+import 'package:personal_finance_tracker/injection.dart';
 import 'package:personal_finance_tracker/shared/services/notification_service.dart';
 import 'package:personal_finance_tracker/shared/widgets/budget/category_dropdown.dart';
 import '../../category/model/category_model.dart';
@@ -15,12 +17,16 @@ class BudgetScreen extends StatefulWidget {
 class _BudgetScreenState extends State<BudgetScreen> {
   final TextEditingController _budgetController = TextEditingController();
   CategoryModel? _selectedCategory;
+  late final CategoryCubit _categoryCubit;
 
   @override
   void initState() {
     super.initState();
+    _categoryCubit = getIt<CategoryCubit>();
     _budgetController.addListener(_updateBudgetDisplay);
     context.read<BudgetCubit>().fetchCategories();
+    _categoryCubit.fetchCategories();
+
   }
 
   @override
@@ -100,10 +106,12 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     style: TextStyle(color: Colors.red),
                   )
                       : CategoryDropdown(
+                    iconColor: _categoryCubit.getCategoryIconColor("${_selectedCategory?.name}"),
                     categories: state.categories,
                     onChanged: (category) {
                       setState(() => _selectedCategory = category);
                     },
+                    categoryIcon: _categoryCubit.getCategoryIcon("${_selectedCategory?.name}"),
                     selectedCategory: _selectedCategory,
                   )
                 else if (state is BudgetError)
@@ -214,6 +222,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
     }
   }
 
+  // Thêm biến này vào class _BudgetScreenState
+  bool _isUpdate = false;
+  // Sửa hàm _saveBudget
   void _saveBudget() {
     if (_selectedCategory == null) {
       NotificationService.showError('Please select a category');
@@ -228,6 +239,14 @@ class _BudgetScreenState extends State<BudgetScreen> {
       return;
     }
 
-    context.read<BudgetCubit>().saveBudget(amount, _selectedCategory!.id);
+    context.read<BudgetCubit>().saveBudget(amount, _selectedCategory!.id)
+        .then((_) {
+      NotificationService.showSuccess(
+          'Budget saved successfully!' // Đơn giản hóa thông báo
+      );
+    })
+        .catchError((e) {
+      NotificationService.showError('Failed to save budget: $e');
+    });
   }
 }

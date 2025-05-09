@@ -1,4 +1,4 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:personal_finance_tracker/features/report/data/repository/report_summary_repository.dart';
 import 'package:personal_finance_tracker/features/transaction/model/transaction_model.dart';

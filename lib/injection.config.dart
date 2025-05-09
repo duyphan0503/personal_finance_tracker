@@ -11,12 +11,28 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:personal_finance_tracker/features/budget/cubit/budget_cubit.dart'
+    as _i540;
+import 'package:personal_finance_tracker/features/budget/data/datasources/budget_remote_datasource.dart'
+    as _i417;
+import 'package:personal_finance_tracker/features/budget/data/repository/budget_repository.dart'
+    as _i480;
 import 'package:personal_finance_tracker/features/budget/model/budget_model.dart'
     as _i755;
-import 'package:personal_finance_tracker/features/budget/model/category_model.dart'
-    as _i824;
+import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart'
+    as _i688;
+import 'package:personal_finance_tracker/features/category/data/datasources/category_remote_datasource.dart'
+    as _i589;
+import 'package:personal_finance_tracker/features/category/data/repository/category_repository.dart'
+    as _i125;
 import 'package:personal_finance_tracker/features/category/model/category_model.dart'
     as _i800;
+import 'package:personal_finance_tracker/features/report/cubit/report_summary_cubit.dart'
+    as _i817;
+import 'package:personal_finance_tracker/features/report/data/datasources/report_summary_remote_datasource.dart'
+    as _i826;
+import 'package:personal_finance_tracker/features/report/data/repository/report_summary_repository.dart'
+    as _i1044;
 import 'package:personal_finance_tracker/features/transaction/cubit/transaction_cubit.dart'
     as _i716;
 import 'package:personal_finance_tracker/features/transaction/data/datasources/transaction_remote_datasource.dart'
@@ -29,11 +45,6 @@ import 'package:personal_finance_tracker/register_supabase_module.dart'
     as _i906;
 import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
-import 'features/budget/cubit/budget_cubit.dart';
-import 'features/budget/data/datasources/budget_remote_datasource.dart';
-import 'features/budget/data/repository/budget_repository.dart';
-import 'features/category/data/datasources/category_remote_datasource.dart';
-
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
   _i174.GetIt init({
@@ -45,14 +56,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i454.SupabaseClient>(
       () => registerSupabaseModule.supabaseClient,
     );
-    gh.lazySingleton<BudgetRemoteDataSource>(
-      () => BudgetRemoteDataSource(gh<_i454.SupabaseClient>()),
+    gh.lazySingleton<_i826.ReportSummaryRemoteDataSource>(
+      () => _i826.ReportSummaryRemoteDataSource(gh<_i454.SupabaseClient>()),
     );
     gh.lazySingleton<_i114.TransactionRemoteDataSource>(
       () => _i114.TransactionRemoteDataSource(gh<_i454.SupabaseClient>()),
-    );
-    gh.lazySingleton<CategoryRemoteDataSource>(
-      () => CategoryRemoteDataSource(gh<_i454.SupabaseClient>()),
     );
     gh.factory<_i800.CategoryModel>(
       () => _i800.CategoryModel(
@@ -67,6 +75,20 @@ extension GetItInjectableX on _i174.GetIt {
       () =>
           _i1067.TransactionRepository(gh<_i114.TransactionRemoteDataSource>()),
     );
+    gh.lazySingleton<_i417.BudgetRemoteDataSource>(
+      () => _i417.BudgetRemoteDataSource(gh<_i454.SupabaseClient>()),
+    );
+    gh.lazySingleton<_i589.CategoryRemoteDataSource>(
+      () => _i589.CategoryRemoteDataSource(gh<_i454.SupabaseClient>()),
+    );
+    gh.lazySingleton<_i1044.ReportSummaryRepository>(
+      () => _i1044.ReportSummaryRepository(
+        gh<_i826.ReportSummaryRemoteDataSource>(),
+      ),
+    );
+    gh.factory<_i817.ReportSummaryCubit>(
+      () => _i817.ReportSummaryCubit(gh<_i1044.ReportSummaryRepository>()),
+    );
     gh.factory<_i854.TransactionModel>(
       () => _i854.TransactionModel(
         id: gh<String>(),
@@ -75,12 +97,9 @@ extension GetItInjectableX on _i174.GetIt {
         transactionDate: gh<DateTime>(),
         note: gh<String>(),
         categoryId: gh<String>(),
-        category: gh<_i824.CategoryModel>(),
+        category: gh<_i800.CategoryModel>(),
         createdAt: gh<DateTime>(),
       ),
-    );
-    gh.factory<BudgetRepository>(
-      () => BudgetRepository(gh<BudgetRemoteDataSource>()),
     );
     gh.factory<_i755.BudgetModel>(
       () => _i755.BudgetModel(
@@ -92,10 +111,21 @@ extension GetItInjectableX on _i174.GetIt {
         category: gh<_i800.CategoryModel>(),
       ),
     );
+    gh.factory<_i480.BudgetRepository>(
+      () => _i480.BudgetRepository(gh<_i417.BudgetRemoteDataSource>()),
+    );
     gh.factory<_i716.TransactionCubit>(
       () => _i716.TransactionCubit(gh<_i1067.TransactionRepository>()),
     );
-    gh.factory<BudgetCubit>(() => BudgetCubit(gh<BudgetRepository>()));
+    gh.factory<_i688.CategoryCubit>(
+      () => _i688.CategoryCubit(gh<_i589.CategoryRemoteDataSource>()),
+    );
+    gh.factory<_i125.CategoryRepository>(
+      () => _i125.CategoryRepository(gh<_i589.CategoryRemoteDataSource>()),
+    );
+    gh.factory<_i540.BudgetCubit>(
+      () => _i540.BudgetCubit(gh<_i480.BudgetRepository>()),
+    );
     return this;
   }
 }

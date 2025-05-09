@@ -42,6 +42,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
+            fontSize: 30,
           ),
         ),
         centerTitle: true,
@@ -68,14 +69,15 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 // Amount Display
                 Center(
                   child: Text(
-                      _budgetController.text.isEmpty
-                          ? '\$0'
-                          : '\$${_formatCurrency(_budgetController.text)}',
-                      style: const TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      )),
+                    _budgetController.text.isEmpty
+                        ? '\$0'
+                        : '\$${_formatCurrency(_budgetController.text)}',
+                    style: const TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 32),
 
@@ -92,7 +94,12 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 if (state is BudgetLoading)
                   const Center(child: CircularProgressIndicator())
                 else if (state is BudgetLoaded)
-                  CategoryDropdown(
+                  state.categories.isEmpty
+                      ? const Text(
+                    'No categories available',
+                    style: TextStyle(color: Colors.red),
+                  )
+                      : CategoryDropdown(
                     categories: state.categories,
                     onChanged: (category) {
                       setState(() => _selectedCategory = category);
@@ -104,7 +111,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
                       'Error: ${state.message}',
                       style: const TextStyle(color: Colors.red),
                     ),
-
                 const SizedBox(height: 24),
 
                 // Monthly Budget Input
@@ -170,23 +176,36 @@ class _BudgetScreenState extends State<BudgetScreen> {
 
   String _formatCurrency(String value) {
     final number = double.tryParse(value.replaceAll(',', '')) ?? 0;
-    return number.toStringAsFixed(0).replaceAllMapped(
+    return number.toStringAsFixed(number.truncateToDouble() == number ? 0 : 2)
+        .replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]},',
     );
   }
 
   void _formatCurrencyInput(String value) {
-    final cleanValue = value.replaceAll(RegExp(r'[^0-9]'), '');
+    final cleanValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
     if (cleanValue.isEmpty) {
       _budgetController.text = '';
       return;
     }
-    final number = int.tryParse(cleanValue) ?? 0;
-    final formatted = number.toString().replaceAllMapped(
+
+    // Xử lý trường hợp có nhiều dấu chấm
+    final dots = cleanValue.split('.').length - 1;
+    final sanitizedValue = dots > 1
+        ? cleanValue.replaceFirst('.', '').replaceAll('.', '')
+        : cleanValue;
+
+    final parts = sanitizedValue.split('.');
+    final integerPart = parts[0].replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]},',
     );
+
+    final formatted = parts.length > 1
+        ? '$integerPart.${parts[1]}'
+        : integerPart;
+
     if (formatted != _budgetController.text) {
       _budgetController.value = TextEditingValue(
         text: formatted,

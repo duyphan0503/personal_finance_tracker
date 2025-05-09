@@ -112,7 +112,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                             trailingStyle: TextStyle(
                               fontSize: 16,
                               color:
-                                  '${transaction.category!.type}' == 'income'
+                                  (transaction.category!.type.name == 'income')
                                       ? Colors.green
                                       : Colors.red,
                             ),

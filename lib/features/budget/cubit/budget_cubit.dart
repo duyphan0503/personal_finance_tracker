@@ -17,26 +17,34 @@ class BudgetCubit extends Cubit<BudgetState> {
     try {
       emit(BudgetLoading());
       final categories = await _repository.fetchCategories();
-      emit(BudgetLoaded(categories));
+      emit(categories.isEmpty
+          ? BudgetEmpty()
+          : BudgetLoaded(categories));
     } catch (e) {
       emit(BudgetError('Failed to load categories: ${e.toString()}'));
+      rethrow; // Giữ nguyên lỗi để có thể xử lý ở tầng UI nếu cần
     }
   }
 
   Future<void> saveBudget(double amount, String categoryId) async {
     try {
+      if (amount <= 0) {
+        emit(BudgetError('Amount must be greater than 0'));
+        return;
+      }
+
       emit(BudgetSaving());
       final budget = BudgetModel(
         id: '', // ID sẽ được tạo tự động bởi Supabase
         categoryId: categoryId,
         amount: amount,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
       );
       await _repository.saveBudget(budget);
       emit(BudgetSaved());
+      fetchCategories(); // Refresh danh sách sau khi lưu
     } catch (e) {
       emit(BudgetError('Failed to save budget: ${e.toString()}'));
+      rethrow;
     }
   }
 }

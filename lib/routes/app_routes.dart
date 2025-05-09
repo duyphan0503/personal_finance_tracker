@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:personal_finance_tracker/features/budget/view/budget_screen.dart';
 import 'package:personal_finance_tracker/features/report/view/report_summary_screen.dart';
+
+import 'package:personal_finance_tracker/features/auth/view/sign_in_screen.dart';
+
 import 'package:personal_finance_tracker/features/transaction/view/transaction_history_screen.dart';
 
 class AppRoutes {
@@ -10,14 +14,22 @@ class AppRoutes {
   static const String transactions = '/transactions';
   static const String transactionDetail = '/transactions/:id';
   static const String addTransaction = '/transactions/add';
-  static const String login = '/login';
+
   static const String budget = '/budget';
   static const String reportSummary = '/report-summary';
+
+  static const String signIn = '/signIn';
+
   // GoRouter configuration
   static final GoRouter router = GoRouter(
-    initialLocation: reportSummary,
+    initialLocation: signIn,
     debugLogDiagnostics: true,
     routes: [
+      GoRoute(
+        path: signIn,
+        name: 'signIn',
+        builder: (context, state) => const SignInScreen(),
+      ),
       /*GoRoute(
         path: dashboard,
         name: 'dashboard',
@@ -49,12 +61,12 @@ class AppRoutes {
       GoRoute(
         path: budget,
         name: 'budget',
-        builder: (context, state) =>  BudgetScreen(),
+        builder: (context, state) => BudgetScreen(),
       ),
       GoRoute(
         path: reportSummary,
         name: 'report-summary',
-        builder: (context, state) =>  ReportSummaryScreen(),
+        builder: (context, state) => ReportSummaryScreen(),
       ),
     ],
     // Optional error handler for invalid routes

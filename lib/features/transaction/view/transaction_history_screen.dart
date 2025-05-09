@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart';
 import 'package:personal_finance_tracker/shared/services/notification_service.dart';
+import 'package:personal_finance_tracker/shared/utils/format_utils.dart';
 import 'package:personal_finance_tracker/shared/widgets/transactions/transaction_tile.dart';
 
 import '../cubit/transaction_cubit.dart';
@@ -9,17 +11,20 @@ class TransactionHistoryScreen extends StatefulWidget {
   const TransactionHistoryScreen({super.key});
 
   @override
-  State<TransactionHistoryScreen> createState() => _TransactionHistoryScreenState();
+  State<TransactionHistoryScreen> createState() =>
+      _TransactionHistoryScreenState();
 }
 
 class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
-  late final TransactionCubit _cubit;
+  late final TransactionCubit _transactionCubit;
+  late final CategoryCubit _categoryCubit;
 
   @override
   void initState() {
     super.initState();
-    _cubit = context.read<TransactionCubit>();
-    _cubit.fetchAllTransactions();
+    _transactionCubit = context.read<TransactionCubit>();
+    _categoryCubit = context.read<CategoryCubit>();
+    _transactionCubit.fetchAllTransactions();
   }
 
   @override
@@ -28,15 +33,21 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       appBar: AppBar(
         title: const Text('Transaction History'),
         centerTitle: true,
-        titleTextStyle: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black),
+        titleTextStyle: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Today'),
-            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 8, bottom: 8),
+              child: Text('Today', style: TextStyle(fontSize: 16)),
+            ),
             Expanded(
               child: BlocBuilder<TransactionCubit, TransactionState>(
                 builder: (context, state) {
@@ -81,7 +92,31 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                             return false;
                           },
                           child: TransactionTile(
+                            iconLeading: _categoryCubit.getCategoryIcon(
+                              transaction.category!.name,
+                            ),
                             title: transaction.category!.name,
+                            trailing: FormatUtils.formatCurrency(
+                              transaction.amount,
+                            ),
+                            subTrailing: FormatUtils.formatDate(
+                              transaction.transactionDate,
+                            ),
+                            iconLeadingStyle: IconThemeData(
+                              size: 32,
+                              color: _categoryCubit.getCategoryIconColor(
+                                transaction.category!.name,
+                              ),
+                            ),
+                            titleStyle: TextStyle(fontSize: 16),
+                            trailingStyle: TextStyle(
+                              fontSize: 16,
+                              color:
+                                  '${transaction.category!.type}' == 'income'
+                                      ? Colors.green
+                                      : Colors.red,
+                            ),
+                            subTrailingStyle: TextStyle(fontSize: 14),
                           ),
                         );
                       },
@@ -106,17 +141,14 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       context: context,
       title: 'Delete Transaction',
       content:
-      "Are you sure you want to delete the transaction ${transaction
-          .categoryId}",
+          "Are you sure you want to delete the transaction ${transaction.categoryId}",
       cancelText: 'Cancel',
       confirmText: 'Delete',
     );
 
     if (confirm && context.mounted) {
       context.read<TransactionCubit>().deleteTransaction(transaction.id);
-      NotificationService.showSuccess(
-        'Transaction deleted successfully',
-      );
+      NotificationService.showSuccess('Transaction deleted successfully');
       return;
     }
   }

@@ -11,6 +11,12 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
+import 'package:personal_finance_tracker/features/auth/cubit/auth_cubit.dart'
+    as _i909;
+import 'package:personal_finance_tracker/features/auth/data/datasources/auth_remote_datasource.dart'
+    as _i387;
+import 'package:personal_finance_tracker/features/auth/data/repositories/auth_repository.dart'
+    as _i441;
 import 'package:personal_finance_tracker/features/budget/cubit/budget_cubit.dart'
     as _i540;
 import 'package:personal_finance_tracker/features/budget/data/datasources/budget_remote_datasource.dart'
@@ -56,34 +62,46 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i454.SupabaseClient>(
       () => registerSupabaseModule.supabaseClient,
     );
+    gh.factory<_i800.CategoryModel>(
+      () => _i800.CategoryModel(
+        id: gh<String>(),
+        name: gh<String>(),
+        type: gh<_i800.CategoryType>(),
+      ),
+    );
+    gh.factory<_i755.BudgetModel>(
+      () => _i755.BudgetModel(
+        id: gh<String>(),
+        categoryId: gh<String>(),
+        amount: gh<double>(),
+        category: gh<_i800.CategoryModel>(),
+      ),
+    );
+    gh.lazySingleton<_i589.CategoryRemoteDataSource>(
+      () => _i589.CategoryRemoteDataSource(gh<_i454.SupabaseClient>()),
+    );
     gh.lazySingleton<_i826.ReportSummaryRemoteDataSource>(
       () => _i826.ReportSummaryRemoteDataSource(gh<_i454.SupabaseClient>()),
     );
     gh.lazySingleton<_i114.TransactionRemoteDataSource>(
       () => _i114.TransactionRemoteDataSource(gh<_i454.SupabaseClient>()),
     );
-    gh.factory<_i800.CategoryModel>(
-      () => _i800.CategoryModel(
-        id: gh<String>(),
-        name: gh<String>(),
-        type: gh<_i800.CategoryType>(),
-        createdAt: gh<DateTime>(),
-        updatedAt: gh<DateTime>(),
-      ),
+    gh.lazySingleton<_i125.CategoryRepository>(
+      () => _i125.CategoryRepository(gh<_i589.CategoryRemoteDataSource>()),
     );
     gh.lazySingleton<_i1067.TransactionRepository>(
       () =>
           _i1067.TransactionRepository(gh<_i114.TransactionRemoteDataSource>()),
     );
-    gh.lazySingleton<_i417.BudgetRemoteDataSource>(
-      () => _i417.BudgetRemoteDataSource(gh<_i454.SupabaseClient>()),
-    );
-    gh.lazySingleton<_i589.CategoryRemoteDataSource>(
-      () => _i589.CategoryRemoteDataSource(gh<_i454.SupabaseClient>()),
-    );
     gh.lazySingleton<_i1044.ReportSummaryRepository>(
       () => _i1044.ReportSummaryRepository(
         gh<_i826.ReportSummaryRemoteDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i417.BudgetRemoteDataSource>(
+      () => _i417.BudgetRemoteDataSource(
+        gh<_i454.SupabaseClient>(),
+        gh<_i589.CategoryRemoteDataSource>(),
       ),
     );
     gh.factory<_i817.ReportSummaryCubit>(
@@ -101,30 +119,31 @@ extension GetItInjectableX on _i174.GetIt {
         createdAt: gh<DateTime>(),
       ),
     );
-    gh.factory<_i755.BudgetModel>(
-      () => _i755.BudgetModel(
-        id: gh<String>(),
-        categoryId: gh<String>(),
-        amount: gh<double>(),
-        createdAt: gh<DateTime>(),
-        updatedAt: gh<DateTime>(),
-        category: gh<_i800.CategoryModel>(),
+    gh.lazySingleton<_i387.AuthRemoteDataSource>(
+      () => _i387.AuthRemoteDataSource(
+        supabaseClient: gh<_i454.SupabaseClient>(),
       ),
-    );
-    gh.factory<_i480.BudgetRepository>(
-      () => _i480.BudgetRepository(gh<_i417.BudgetRemoteDataSource>()),
     );
     gh.factory<_i716.TransactionCubit>(
       () => _i716.TransactionCubit(gh<_i1067.TransactionRepository>()),
     );
     gh.factory<_i688.CategoryCubit>(
-      () => _i688.CategoryCubit(gh<_i589.CategoryRemoteDataSource>()),
+      () => _i688.CategoryCubit(gh<_i125.CategoryRepository>()),
     );
-    gh.factory<_i125.CategoryRepository>(
-      () => _i125.CategoryRepository(gh<_i589.CategoryRemoteDataSource>()),
+    gh.lazySingleton<_i441.AuthRepository>(
+      () => _i441.AuthRepository(dataSource: gh<_i387.AuthRemoteDataSource>()),
+    );
+    gh.factory<_i480.BudgetRepository>(
+      () => _i480.BudgetRepository(
+        gh<_i417.BudgetRemoteDataSource>(),
+        gh<_i589.CategoryRemoteDataSource>(),
+      ),
     );
     gh.factory<_i540.BudgetCubit>(
       () => _i540.BudgetCubit(gh<_i480.BudgetRepository>()),
+    );
+    gh.factory<_i909.AuthCubit>(
+      () => _i909.AuthCubit(authRepository: gh<_i441.AuthRepository>()),
     );
     return this;
   }

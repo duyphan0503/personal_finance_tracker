@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../category/model/category_model.dart';
 import '../../model/budget_model.dart';
+
 @lazySingleton
 class BudgetRemoteDataSource {
   final SupabaseClient _client;
@@ -20,6 +22,7 @@ class BudgetRemoteDataSource {
         throw Exception('No categories found');
       }
 
+      debugPrint('Categories fetched: ${response.length} items');
       return response.map<CategoryModel>((data) {
         try {
           return CategoryModel.fromJson(data);
@@ -28,6 +31,7 @@ class BudgetRemoteDataSource {
         }
       }).toList();
     } catch (e) {
+      debugPrint('Error fetching categories: ${e.toString()}');
       throw Exception('Failed to fetch categories: ${e.toString()}');
     }
   }
@@ -46,7 +50,9 @@ class BudgetRemoteDataSource {
       if (response == null) {
         throw Exception('Failed to save budget: No response from server');
       }
+      debugPrint('Budget saved successfully: $response');
     } catch (e) {
+      debugPrint('Error saving budget: ${e.toString()}');
       throw Exception('Failed to save budget: ${e.toString()}');
     }
   }

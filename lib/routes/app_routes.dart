@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/features/budget/view/budget_screen.dart';
+import 'package:personal_finance_tracker/features/report/view/report_summary_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/transaction_history_screen.dart';
 
 class AppRoutes {
@@ -11,10 +12,10 @@ class AppRoutes {
   static const String addTransaction = '/transactions/add';
   static const String login = '/login';
   static const String budget = '/budget';
-
+  static const String reportSummary = '/report-summary';
   // GoRouter configuration
   static final GoRouter router = GoRouter(
-    initialLocation: budget,
+    initialLocation: reportSummary,
     debugLogDiagnostics: true,
     routes: [
       /*GoRoute(
@@ -49,6 +50,11 @@ class AppRoutes {
         path: budget,
         name: 'budget',
         builder: (context, state) =>  BudgetScreen(),
+      ),
+      GoRoute(
+        path: reportSummary,
+        name: 'report-summary',
+        builder: (context, state) =>  ReportSummaryScreen(),
       ),
     ],
     // Optional error handler for invalid routes

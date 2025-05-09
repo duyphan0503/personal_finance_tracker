@@ -7,37 +7,33 @@ import '../../model/category_model.dart';
 class CategoryRemoteDataSource {
   final SupabaseClient _client;
 
-  CategoryRemoteDataSource(SupabaseClient? client)
-      : _client = client ?? Supabase.instance.client;
+  CategoryRemoteDataSource(this._client);
 
-  // Lấy tất cả danh mục
   Future<List<CategoryModel>> fetchCategories() async {
     try {
-      final res = await _client
+      final response = await _client
           .from('categories')
           .select()
-          .order('created_at', ascending: false);
-      return res.map((data) => CategoryModel.fromJson(data)).toList();
-    } catch (e) {
-      throw Exception('Failed to fetch categories: $e');
-    }
-  }
-
-  // Lấy danh mục theo loại
-  Future<List<CategoryModel>> fetchCategoriesByType(CategoryType type) async {
-    try {
-      final res = await _client
-          .from('categories')
-          .select()
-          .eq('type', CategoryModel.typeToString(type))
           .order('name', ascending: true);
-      return res.map((data) => CategoryModel.fromJson(data)).toList();
+
+      if (response.isEmpty) {
+        throw Exception('No categories found in database');
+      }
+
+      return response.map<CategoryModel>((data) {
+        try {
+          return CategoryModel.fromJson(data);
+        } catch (e) {
+          throw FormatException('Failed to parse category: $e\nData: $data');
+        }
+      }).toList();
+    } on FormatException catch (e) {
+      throw Exception('Data format error: ${e.message}');
     } catch (e) {
-      throw Exception('Failed to fetch categories by type: $e');
+      throw Exception('Failed to fetch categories: ${e.toString()}');
     }
   }
 
-  // Tạo danh mục mới
   Future<CategoryModel> createCategory({
     required String name,
     required CategoryType type,
@@ -47,14 +43,13 @@ class CategoryRemoteDataSource {
         'name': name,
         'type': CategoryModel.typeToString(type),
       };
-      final res = await _client.from('categories').insert(payload).single();
-      return CategoryModel.fromJson(res);
+      final response = await _client.from('categories').insert(payload).select().single();
+      return CategoryModel.fromJson(response);
     } catch (e) {
-      throw Exception('Failed to create category: $e');
+      throw Exception('Failed to create category: ${e.toString()}');
     }
   }
 
-  // Cập nhật danh mục
   Future<CategoryModel> updateCategory({
     required String id,
     String? name,
@@ -65,23 +60,23 @@ class CategoryRemoteDataSource {
       if (name != null) changes['name'] = name;
       if (type != null) changes['type'] = CategoryModel.typeToString(type);
 
-      final res = await _client
+      final response = await _client
           .from('categories')
           .update(changes)
           .eq('id', id)
+          .select()
           .single();
-      return CategoryModel.fromJson(res);
+      return CategoryModel.fromJson(response);
     } catch (e) {
-      throw Exception('Failed to update category: $e');
+      throw Exception('Failed to update category: ${e.toString()}');
     }
   }
 
-  // Xóa danh mục
   Future<void> deleteCategory(String id) async {
     try {
       await _client.from('categories').delete().eq('id', id);
     } catch (e) {
-      throw Exception('Failed to delete category: $e');
+      throw Exception('Failed to delete category: ${e.toString()}');
     }
   }
 }

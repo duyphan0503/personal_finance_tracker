@@ -1,6 +1,6 @@
 import 'package:injectable/injectable.dart';
 
-import '../../budget/model/category_model.dart';
+import '../../category/model/category_model.dart';
 
 @injectable
 class TransactionModel {
@@ -24,43 +24,37 @@ class TransactionModel {
     required this.createdAt,
   });
 
-  factory TransactionModel.fromJson(
-    Map<String, dynamic> json, {
-    CategoryModel? embeddedCategory,
-  }) {
-    CategoryModel? category;
-    if (embeddedCategory != null) {
-      category = embeddedCategory;
-    } else if (json['categories'] != null && json['categories'] is Map) {
-      category = CategoryModel.fromJson(json['categories']);
-    } else if (json['category_name'] != null) {
-      category = CategoryModel(
-        id: json['categories']['id'] ?? '',
-        userId: '',
-        name: json['categories']['name'] ?? '',
-        type: CategoryModel.categoryTypeFromString(json['categories']['type']),
-      );
-    }
+  factory TransactionModel.fromJson(Map<String, dynamic> json) {
+    final catJson = json['categories'] as Map<String, dynamic>?;
+    final CategoryModel? category =
+    catJson != null ? CategoryModel.fromJson(catJson) : null;
 
     return TransactionModel(
-      id: json['id'],
-      userId: json['user_id'],
+      id: json['id'] as String,
+      userId: json['user_id'] as String,
       amount: (json['amount'] as num).toDouble(),
-      transactionDate: DateTime.parse(json['transaction_date']),
-      note: json['note'],
-      categoryId: json['category_id'],
+      transactionDate: DateTime.parse(json['transaction_date'] as String),
+      note: json['note'] as String?,
+      categoryId: json['category_id'] as String?,
       category: category,
-      createdAt: DateTime.parse(json['created_at']),
+      createdAt: DateTime.parse(json['created_at'] as String),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    final data = <String, dynamic>{
       'user_id': userId,
       'amount': amount,
       'transaction_date': transactionDate.toIso8601String(),
-      'note': note,
-      'category_id': categoryId,
     };
+
+    if (note != null && note!.isNotEmpty) {
+      data['note'] = note;
+    }
+    if (categoryId != null && categoryId!.isNotEmpty) {
+      data['category_id'] = categoryId;
+    }
+
+    return data;
   }
 }

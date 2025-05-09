@@ -12,13 +12,16 @@ class CategoryRemoteDataSource {
 
   Future<List<CategoryModel>> fetchCategories() async {
     try {
-      final res = _client
+      final res = await _client
           .from('categories')
           .select()
           .order('name', ascending: true);
+
+
       return (res as List).map((data) => CategoryModel.fromJson(data)).toList();
     } catch (e) {
-      throw Exception('Failed to fetch categories: $e');
+      debugPrint('Error fetching categories: $e');
+      throw Exception('Failed to fetch categories: ${e.toString()}');
     }
   }
 

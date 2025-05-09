@@ -1,0 +1,1019 @@
+{
+	"info": {
+		"_postman_id": "d5430f89-6f13-41a4-a3be-4e3916814fe2",
+		"name": "Personal Finance Tracker",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44155959",
+		"_collection_link": "https://winter-rocket-322037.postman.co/workspace/Team-Workspace~da5beeb9-42ad-4527-817a-3af2c2276684/collection/44155959-d5430f89-6f13-41a4-a3be-4e3916814fe2?action=share&source=collection_link&creator=44155959"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Sign Up",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"test11@gmail.com\",\r\n    \"password\": \"test11\",\r\n    \"data\": {\r\n        \"full_name\": \"Tester\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SUPABASE_URL}}/auth/v1/signup",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"test11@gmail.com\",\r\n    \"password\": \"test11\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SUPABASE_URL}}/auth/v1/token?grant_type=password",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"token"
+							],
+							"query": [
+								{
+									"key": "grant_type",
+									"value": "password"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET User Info",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzMwMTAyLCJpYXQiOjE3NDY3MjY1MDIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3MjY1MDJ9XSwic2Vzc2lvbl9pZCI6IjAzMTY5YWY4LWVkMzEtNDAyNS04NjY1LWQ1ZTRjNjgzM2IzYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.fvG4hOoQTEclhiSfUA0_Q5ZCESrjm-1GunbO3YjgiEI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{SUPABASE_URL}}/auth/v1/user",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_URL}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{SUPABASE_URL}}/auth/v1/logout",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"auth",
+								"v1",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profiles",
+			"item": [
+				{
+					"name": "GET My Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzMwMTAyLCJpYXQiOjE3NDY3MjY1MDIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3MjY1MDJ9XSwic2Vzc2lvbl9pZCI6IjAzMTY5YWY4LWVkMzEtNDAyNS04NjY1LWQ1ZTRjNjgzM2IzYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.fvG4hOoQTEclhiSfUA0_Q5ZCESrjm-1GunbO3YjgiEI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/users?select=*",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"users"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "*"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "POST Create Category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NjMxOTM0LCJpYXQiOjE3NDY2MjgzMzQsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY2MjgzMzR9XSwic2Vzc2lvbl9pZCI6ImNmZGRmNmE2LWFkMGYtNGQ3YS05MjVjLTFiYjhmNmM0ZmNkZSIsImlzX2Fub255bW91cyI6ZmFsc2V9.sfWto8nZ8T1JRXIiO0q0av3KiX0sskXDubfHTje4A3c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n    \"name\": \"Housing\",\r\n    \"type\": \"Expense\"\r\n    },\r\n\r\n     {\r\n    \"name\": \"Shopping\",\r\n    \"type\": \"Expense\"\r\n    },\r\n\r\n     {\r\n    \"name\": \"Food\",\r\n    \"type\": \"Expense\"\r\n    },\r\n\r\n    {\r\n    \"name\": \"Salary\",\r\n    \"type\": \"Income\"\r\n    },\r\n\r\n    {\r\n    \"name\": \"Freelance\",\r\n    \"type\": \"Income\"\r\n    },\r\n\r\n    {\r\n    \"name\": \"Investments\",\r\n    \"type\": \"Income\"\r\n    },\r\n\r\n    {\r\n    \"name\": \"Other\",\r\n    \"type\": \"Income\"\r\n    }\r\n]\r\n\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/categories",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List My Categories",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/categories?select=*&order=name.asc",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "*"
+								},
+								{
+									"key": "order",
+									"value": "name.asc"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category by ID",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NjMxOTM0LCJpYXQiOjE3NDY2MjgzMzQsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY2MjgzMzR9XSwic2Vzc2lvbl9pZCI6ImNmZGRmNmE2LWFkMGYtNGQ3YS05MjVjLTFiYjhmNmM0ZmNkZSIsImlzX2Fub255bW91cyI6ZmFsc2V9.sfWto8nZ8T1JRXIiO0q0av3KiX0sskXDubfHTje4A3c",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/users?select=*/rest/v1/categories?select=*&id=eq.b0e4e405-0c6b-4591-8514-5ba971cb6423",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"users"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "*/rest/v1/categories?select=*"
+								},
+								{
+									"key": "id",
+									"value": "eq.b0e4e405-0c6b-4591-8514-5ba971cb6423"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzMwMTAyLCJpYXQiOjE3NDY3MjY1MDIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3MjY1MDJ9XSwic2Vzc2lvbl9pZCI6IjAzMTY5YWY4LWVkMzEtNDAyNS04NjY1LWQ1ZTRjNjgzM2IzYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.fvG4hOoQTEclhiSfUA0_Q5ZCESrjm-1GunbO3YjgiEI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Investments\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/categories?id=eq.id",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "eq.id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzMwMTAyLCJpYXQiOjE3NDY3MjY1MDIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3MjY1MDJ9XSwic2Vzc2lvbl9pZCI6IjAzMTY5YWY4LWVkMzEtNDAyNS04NjY1LWQ1ZTRjNjgzM2IzYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.fvG4hOoQTEclhiSfUA0_Q5ZCESrjm-1GunbO3YjgiEI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/categories?id=eq.id",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"categories"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "eq.id"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transactions",
+			"item": [
+				{
+					"name": "Add Transaction",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzMwMTAyLCJpYXQiOjE3NDY3MjY1MDIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3MjY1MDJ9XSwic2Vzc2lvbl9pZCI6IjAzMTY5YWY4LWVkMzEtNDAyNS04NjY1LWQ1ZTRjNjgzM2IzYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.fvG4hOoQTEclhiSfUA0_Q5ZCESrjm-1GunbO3YjgiEI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_id\" : \"9d650c5e-c4c3-477e-9c37-375e913da6a9\",\n    \"category_id\": \"93bf511a-37a8-45e9-9266-7f0f73f7b672\",\n    \"amount\": \"1200\",\n    \"transaction_date\": \"09/05/2025\",\n    \"note\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/transactions",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Transactions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzUzODg0LCJpYXQiOjE3NDY3NTAyODQsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3NTAyODR9XSwic2Vzc2lvbl9pZCI6ImQ5ZWMwMzdhLTIyYWYtNGNiZi04ZGMzLTQwMjM3MWJkMzA0YyIsImlzX2Fub255bW91cyI6ZmFsc2V9.wig0C-gEljH2q-Mgf7GiUzRpoMnFy4SmT6mI8CuS8Ps",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/transactions?select=*,categories(*)",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "*,categories(*)"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzMwMTAyLCJpYXQiOjE3NDY3MjY1MDIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3MjY1MDJ9XSwic2Vzc2lvbl9pZCI6IjAzMTY5YWY4LWVkMzEtNDAyNS04NjY1LWQ1ZTRjNjgzM2IzYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.fvG4hOoQTEclhiSfUA0_Q5ZCESrjm-1GunbO3YjgiEI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/transactions?select='*'&id=eq.815ec22f-d45a-464d-be29-0101bc67bcc7",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "'*'"
+								},
+								{
+									"key": "id",
+									"value": "eq.815ec22f-d45a-464d-be29-0101bc67bcc7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Transaction",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzMwMTAyLCJpYXQiOjE3NDY3MjY1MDIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3MjY1MDJ9XSwic2Vzc2lvbl9pZCI6IjAzMTY5YWY4LWVkMzEtNDAyNS04NjY1LWQ1ZTRjNjgzM2IzYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.fvG4hOoQTEclhiSfUA0_Q5ZCESrjm-1GunbO3YjgiEI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"amount\": \"1500\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/transactions?id=eq.815ec22f-d45a-464d-be29-0101bc67bcc7",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "eq.815ec22f-d45a-464d-be29-0101bc67bcc7"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Transaction",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/transactions?id=eq.815ec22f-d45a-464d-be29-0101bc67bcc7",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "eq.815ec22f-d45a-464d-be29-0101bc67bcc7"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Budgets",
+			"item": [
+				{
+					"name": "Set Budget for Category",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzMwMTAyLCJpYXQiOjE3NDY3MjY1MDIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3MjY1MDJ9XSwic2Vzc2lvbl9pZCI6IjAzMTY5YWY4LWVkMzEtNDAyNS04NjY1LWQ1ZTRjNjgzM2IzYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.fvG4hOoQTEclhiSfUA0_Q5ZCESrjm-1GunbO3YjgiEI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/budgets",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"budgets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Budgets",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzMwMTAyLCJpYXQiOjE3NDY3MjY1MDIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3MjY1MDJ9XSwic2Vzc2lvbl9pZCI6IjAzMTY5YWY4LWVkMzEtNDAyNS04NjY1LWQ1ZTRjNjgzM2IzYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.fvG4hOoQTEclhiSfUA0_Q5ZCESrjm-1GunbO3YjgiEI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/budgets?select=*",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"budgets"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "*"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Budget by ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzMwMTAyLCJpYXQiOjE3NDY3MjY1MDIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3MjY1MDJ9XSwic2Vzc2lvbl9pZCI6IjAzMTY5YWY4LWVkMzEtNDAyNS04NjY1LWQ1ZTRjNjgzM2IzYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.fvG4hOoQTEclhiSfUA0_Q5ZCESrjm-1GunbO3YjgiEI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/budgets?id=eq.id",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"budgets"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "eq.id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Budget",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzMwMTAyLCJpYXQiOjE3NDY3MjY1MDIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3MjY1MDJ9XSwic2Vzc2lvbl9pZCI6IjAzMTY5YWY4LWVkMzEtNDAyNS04NjY1LWQ1ZTRjNjgzM2IzYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.fvG4hOoQTEclhiSfUA0_Q5ZCESrjm-1GunbO3YjgiEI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"category_id\": \"\",\n    \"amount\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/budgets?id=eq.id",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"budgets"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "eq.id"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Budget",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsImtpZCI6IkpweHQvL1lWL1A1bC9QWUQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2tsYWtwdWtwaHFsYXd6Y250ZHhlLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiI5ZDY1MGM1ZS1jNGMzLTQ3N2UtOWMzNy0zNzVlOTEzZGE2YTkiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzQ2NzMwMTAyLCJpYXQiOjE3NDY3MjY1MDIsImVtYWlsIjoidGVzdDExQGdtYWlsLmNvbSIsInBob25lIjoiIiwiYXBwX21ldGFkYXRhIjp7InByb3ZpZGVyIjoiZW1haWwiLCJwcm92aWRlcnMiOlsiZW1haWwiXX0sInVzZXJfbWV0YWRhdGEiOnsiZW1haWwiOiJ0ZXN0MTFAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImZ1bGxfbmFtZSI6IlRlc3RlciIsInBob25lX3ZlcmlmaWVkIjpmYWxzZSwic3ViIjoiOWQ2NTBjNWUtYzRjMy00NzdlLTljMzctMzc1ZTkxM2RhNmE5In0sInJvbGUiOiJhdXRoZW50aWNhdGVkIiwiYWFsIjoiYWFsMSIsImFtciI6W3sibWV0aG9kIjoicGFzc3dvcmQiLCJ0aW1lc3RhbXAiOjE3NDY3MjY1MDJ9XSwic2Vzc2lvbl9pZCI6IjAzMTY5YWY4LWVkMzEtNDAyNS04NjY1LWQ1ZTRjNjgzM2IzYyIsImlzX2Fub255bW91cyI6ZmFsc2V9.fvG4hOoQTEclhiSfUA0_Q5ZCESrjm-1GunbO3YjgiEI",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "apiKey",
+								"value": "{{SUPABASE_API_KEY}}",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{SUPABASE_API_KEY}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{SUPABASE_URL}}/rest/v1/budgets?id=eq.id",
+							"host": [
+								"{{SUPABASE_URL}}"
+							],
+							"path": [
+								"rest",
+								"v1",
+								"budgets"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "eq.id"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reports",
+			"item": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "SUPABASE_URL",
+			"value": "https://klakpukphqlawzcntdxe.supabase.co",
+			"type": "string"
+		},
+		{
+			"key": "SUPABASE_API_KEY",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsYWtwdWtwaHFsYXd6Y250ZHhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MjA5NTIsImV4cCI6MjA2MjE5Njk1Mn0.bF5hvAYfm9zEUbhRYpDHiy_16sAMIJzb5xuRm1zCrNY",
+			"type": "string"
+		}
+	]
+}

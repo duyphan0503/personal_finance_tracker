@@ -9,7 +9,7 @@ Future<void> initSupabase() async {
     anonKey: supApiKey,
     debug: true,
     authOptions: const FlutterAuthClientOptions(
-      autoRefreshToken: false,
+      autoRefreshToken: true,
       authFlowType: AuthFlowType.pkce,
     ).copyWith(localStorage: SecureSessionStorage()),
   );

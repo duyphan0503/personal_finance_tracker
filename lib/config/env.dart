@@ -1,3 +1,3 @@
-const String supUrl = "https://vfektukxknrbsnjazubh.supabase.co";
+const String supUrl = "https://klakpukphqlawzcntdxe.supabase.co";
 const String supApiKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZmZWt0dWt4a25yYnNuamF6dWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY0NTc3NTcsImV4cCI6MjA2MjAzMzc1N30.7UEJ8sbFqlYOQAptqpuBH8Xx4HLCu0WmjuTtEa32AuY";
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsYWtwdWtwaHFsYXd6Y250ZHhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MjA5NTIsImV4cCI6MjA2MjE5Njk1Mn0.bF5hvAYfm9zEUbhRYpDHiy_16sAMIJzb5xuRm1zCrNY";

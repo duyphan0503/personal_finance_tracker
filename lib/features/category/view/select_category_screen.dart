@@ -127,7 +127,7 @@ class _SelectCategoryScreenState extends State<SelectCategoryScreen> {
           title: Text(category.name,
               style: TextStyle(
                 fontSize: 20,
-                fontWeight: FontWeight.w500,
+                //fontWeight: FontWeight.w500,
                 color: Colors.black,
               )),
         ),

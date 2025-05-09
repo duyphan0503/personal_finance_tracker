@@ -1,20 +1,28 @@
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
+import 'package:personal_finance_tracker/features/category/data/datasources/category_remote_datasource.dart';
 
 import '../../model/category_model.dart';
-import '../datasources/category_remote_datasource.dart';
 
-
-@injectable
+@lazySingleton
 class CategoryRepository {
-  final CategoryRemoteDataSource _remoteDataSource;
+  CategoryRemoteDataSource categoryRemoteDataSource;
 
-  CategoryRepository(this._remoteDataSource);
+  CategoryRepository(this.categoryRemoteDataSource);
 
   Future<List<CategoryModel>> fetchCategories() async {
     try {
-      return await _remoteDataSource.fetchCategories();
+      return await categoryRemoteDataSource.fetchCategories();
     } catch (e) {
-      throw Exception('Failed to load categories: ${e.toString()}');
+      throw Exception('Failed to fetch categories: $e');
     }
+  }
+
+  IconData getCategoryIcon(String? categoryName) {
+    return categoryRemoteDataSource.getCategoryIcon(categoryName);
+  }
+
+  Color getCategoryIconColor(String? categoryName) {
+    return categoryRemoteDataSource.getCategoryIconTheme(categoryName);
   }
 }

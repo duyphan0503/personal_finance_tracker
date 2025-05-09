@@ -1,26 +1,30 @@
-part of 'category_cubit.dart';
+import 'package:equatable/equatable.dart';
 
-@immutable
-sealed class CategoryState {}
+import '../model/category_model.dart';
 
-final class CategoryInitial extends CategoryState {}
+abstract class CategoryState extends Equatable {
+  @override
+  List<Object?> get props => [];
+}
 
-final class CategoryLoading extends CategoryState {}
+class CategoryInitial extends CategoryState {}
 
-final class CategoryLoaded extends CategoryState {
+class CategoryLoading extends CategoryState {}
+
+class CategoryLoaded extends CategoryState {
   final List<CategoryModel> categories;
 
   CategoryLoaded(this.categories);
+
+  @override
+  List<Object?> get props => [categories];
 }
 
-final class CategoryOperationSuccess extends CategoryState {
-  final String message;
-
-  CategoryOperationSuccess(this.message);
-}
-
-final class CategoryError extends CategoryState {
+class CategoryError extends CategoryState {
   final String message;
 
   CategoryError(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }

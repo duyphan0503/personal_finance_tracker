@@ -1,82 +1,65 @@
+import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
+import 'package:personal_finance_tracker/features/category/model/category_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
-import '../../model/category_model.dart';
 
 @lazySingleton
 class CategoryRemoteDataSource {
   final SupabaseClient _client;
 
-  CategoryRemoteDataSource(this._client);
+  CategoryRemoteDataSource(SupabaseClient? client)
+      : _client = client ?? Supabase.instance.client;
 
   Future<List<CategoryModel>> fetchCategories() async {
     try {
-      final response = await _client
+      final res = await _client
           .from('categories')
           .select()
           .order('name', ascending: true);
 
-      if (response.isEmpty) {
-        throw Exception('No categories found in database');
-      }
 
-      return response.map<CategoryModel>((data) {
-        try {
-          return CategoryModel.fromJson(data);
-        } catch (e) {
-          throw FormatException('Failed to parse category: $e\nData: $data');
-        }
-      }).toList();
-    } on FormatException catch (e) {
-      throw Exception('Data format error: ${e.message}');
+      return (res as List).map((data) => CategoryModel.fromJson(data)).toList();
     } catch (e) {
+      debugPrint('Error fetching categories: $e');
       throw Exception('Failed to fetch categories: ${e.toString()}');
     }
   }
 
-  Future<CategoryModel> createCategory({
-    required String name,
-    required CategoryType type,
-  }) async {
-    try {
-      final payload = {
-        'name': name,
-        'type': CategoryModel.typeToString(type),
-      };
-      final response = await _client.from('categories').insert(payload).select().single();
-      return CategoryModel.fromJson(response);
-    } catch (e) {
-      throw Exception('Failed to create category: ${e.toString()}');
+  IconData getCategoryIcon(String? categoryName) {
+    switch (categoryName?.toLowerCase()) {
+      case 'food':
+        return Icons.restaurant;
+      case 'shopping':
+        return Icons.shopping_bag;
+      case 'housing':
+        return Icons.home;
+      case 'salary':
+        return Icons.money;
+      case 'freelance':
+        return Icons.work;
+      case 'investment':
+        return Icons.trending_up;
+      default:
+        return Icons.category;
     }
   }
 
-  Future<CategoryModel> updateCategory({
-    required String id,
-    String? name,
-    CategoryType? type,
-  }) async {
-    try {
-      final Map<String, dynamic> changes = {};
-      if (name != null) changes['name'] = name;
-      if (type != null) changes['type'] = CategoryModel.typeToString(type);
-
-      final response = await _client
-          .from('categories')
-          .update(changes)
-          .eq('id', id)
-          .select()
-          .single();
-      return CategoryModel.fromJson(response);
-    } catch (e) {
-      throw Exception('Failed to update category: ${e.toString()}');
-    }
-  }
-
-  Future<void> deleteCategory(String id) async {
-    try {
-      await _client.from('categories').delete().eq('id', id);
-    } catch (e) {
-      throw Exception('Failed to delete category: ${e.toString()}');
+  Color getCategoryIconTheme(String? categoryName) {
+    switch (categoryName?.toLowerCase()) {
+      case 'food':
+        return Colors.orange;
+      case 'shopping':
+        return Colors.indigo;
+      case 'housing':
+        return Colors.brown;
+      case 'salary':
+        return Colors.teal;
+      case 'freelance':
+        return Colors.blue;
+      case 'investment':
+        return Colors.green;
+      default:
+        return Colors.grey;
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/routes/app_routes.dart';
 
 import '../cubit/auth_cubit.dart';
@@ -37,9 +38,7 @@ class _SignInScreenState extends State<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign In'),
-      ),
+      appBar: AppBar(title: const Text('Sign In')),
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state.status == AuthStatus.error) {
@@ -50,7 +49,7 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
             );
           } else if (state.status == AuthStatus.authenticated) {
-            AppRoutes.navigateTo(context, 'transactions');
+            context.go(AppRoutes.dashboard);
           }
         },
         builder: (context, state) {
@@ -88,7 +87,9 @@ class _SignInScreenState extends State<SignInScreen> {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email';
                         }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                        if (!RegExp(
+                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                        ).hasMatch(value)) {
                           return 'Please enter a valid email';
                         }
                         return null;
@@ -104,7 +105,9 @@ class _SignInScreenState extends State<SignInScreen> {
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                            _obscurePassword
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                           ),
                           onPressed: () {
                             setState(() {
@@ -129,32 +132,33 @@ class _SignInScreenState extends State<SignInScreen> {
                     const SizedBox(height: 24),
                     // Sign in button
                     ElevatedButton(
-                      onPressed: state.status == AuthStatus.loading ? null : _signIn,
+                      onPressed:
+                          state.status == AuthStatus.loading ? null : _signIn,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         backgroundColor: Theme.of(context).primaryColor,
                         foregroundColor: Colors.white,
                       ),
-                      child: state.status == AuthStatus.loading
-                          ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                          : const Text(
-                        'Sign In',
-                        style: TextStyle(fontSize: 16),
-                      ),
+                      child:
+                          state.status == AuthStatus.loading
+                              ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : const Text(
+                                'Sign In',
+                                style: TextStyle(fontSize: 16),
+                              ),
                     ),
                     const SizedBox(height: 16),
                     // Forgot password option
                     Center(
                       child: TextButton(
-                        onPressed: () {
-                        },
+                        onPressed: () {},
                         child: const Text('Forgot Password?'),
                       ),
                     ),

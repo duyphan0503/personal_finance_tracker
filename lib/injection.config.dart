@@ -25,6 +25,8 @@ import 'package:personal_finance_tracker/features/category/data/repository/categ
     as _i125;
 import 'package:personal_finance_tracker/features/category/model/category_model.dart'
     as _i800;
+import 'package:personal_finance_tracker/features/dashboard/cubit/dashboard_cubit.dart'
+    as _i988;
 import 'package:personal_finance_tracker/features/transaction/cubit/transaction_cubit.dart'
     as _i716;
 import 'package:personal_finance_tracker/features/transaction/data/datasources/transaction_remote_datasource.dart'
@@ -60,6 +62,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1067.TransactionRepository>(
       () =>
           _i1067.TransactionRepository(gh<_i114.TransactionRemoteDataSource>()),
+    );
+    gh.factory<_i988.DashboardCubit>(
+      () => _i988.DashboardCubit(gh<_i1067.TransactionRepository>()),
     );
     gh.factory<_i854.TransactionModel>(
       () => _i854.TransactionModel(

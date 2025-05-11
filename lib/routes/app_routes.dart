@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/features/auth/view/sign_in_screen.dart';
+import 'package:personal_finance_tracker/features/report/summary/view/report_summary_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/transaction_history_screen.dart';
 
 import '../features/dashboard/view/dashboard_screen.dart';
@@ -14,6 +15,7 @@ class AppRoutes {
   static const String addTransaction = '/transactions/add';
   static const String report = '/report';
   static const String settings = '/settings';
+  static const String reportSummaryScreen = '/report_summary_screen';
 }
 
 class AppRouter {
@@ -23,7 +25,7 @@ class AppRouter {
   // GoRouter configuration
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRoutes.signIn,
+    initialLocation: AppRoutes.reportSummaryScreen,
     routes: [
       GoRoute(
         path: AppRoutes.signIn,
@@ -48,13 +50,14 @@ class AppRouter {
             builder: (context, state) => const TransactionHistoryScreen(),
           ),
           GoRoute(
-            path: AppRoutes.report,
-            builder: (context, state) => const Placeholder(),
+            path: AppRoutes.reportSummaryScreen,
+            builder: (context, state) => const ReportSummaryScreen(),
           ),
           GoRoute(
             path: AppRoutes.settings,
             builder: (context, state) => const Placeholder(),
           ),
+
         ],
       ),
     ],
@@ -100,7 +103,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
     if (location.startsWith(AppRoutes.dashboard)) return 0;
     if (location.startsWith(AppRoutes.addTransaction)) return 1;
     if (location.startsWith(AppRoutes.transactionsHistory)) return 2;
-    if (location.startsWith(AppRoutes.report)) return 3;
+    if (location.startsWith(AppRoutes.reportSummaryScreen)) return 3;
     if (location.startsWith(AppRoutes.settings)) return 4;
     return 0;
   }
@@ -117,7 +120,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
         context.go(AppRoutes.transactionsHistory);
         break;
       case 3:
-        context.go(AppRoutes.report);
+        context.go(AppRoutes.reportSummaryScreen);
         break;
       case 4:
         context.go(AppRoutes.settings);

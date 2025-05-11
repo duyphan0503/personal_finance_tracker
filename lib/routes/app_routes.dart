@@ -13,7 +13,7 @@ class AppRoutes {
 
   // GoRouter configuration
   static final GoRouter router = GoRouter(
-    initialLocation: signIn,
+    initialLocation: reportCategory,
     debugLogDiagnostics: true,
     routes: [
       GoRoute(
@@ -44,6 +44,7 @@ class AppRoutes {
         name: 'addTransaction',
         builder: (context, state) => const AddTransactionScreen(),
       ),*/
+
 
     ],
     // Optional error handler for invalid routes

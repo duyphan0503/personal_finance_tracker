@@ -8,6 +8,8 @@ import 'package:personal_finance_tracker/features/transaction/cubit/transaction_
 import 'package:personal_finance_tracker/injection.dart';
 import 'package:personal_finance_tracker/routes/app_routes.dart';
 
+import 'features/report/summary/cubit/report_summary_cubit.dart';
+
 class PersonalFinanceTrackerApp extends StatefulWidget {
   const PersonalFinanceTrackerApp({super.key});
 
@@ -27,6 +29,7 @@ class _PersonalFinanceTrackerAppState extends State<PersonalFinanceTrackerApp> {
         BlocProvider<AuthCubit>(create: (_) => getIt<AuthCubit>()),
         BlocProvider<CategoryCubit>(create: (_) => getIt<CategoryCubit>()),
         BlocProvider<DashboardCubit>(create: (_) => getIt<DashboardCubit>()),
+        BlocProvider<ReportSummaryCubit>(create: (_) => getIt<ReportSummaryCubit>()),
       ],
       child: MaterialApp.router(
         title: 'Personal Finance Tracker',

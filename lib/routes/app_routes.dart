@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/features/auth/view/sign_in_screen.dart';
+import 'package:personal_finance_tracker/features/auth/view/sign_up_screen.dart';
 import 'package:personal_finance_tracker/features/category/view/select_category_screen.dart';
 import 'package:personal_finance_tracker/features/budget/view/budget_screen.dart';
 import 'package:personal_finance_tracker/features/report/view/report_summary_screen.dart';
@@ -11,6 +12,7 @@ import '../features/dashboard/view/dashboard_screen.dart';
 class AppRoutes {
   // Route name constants
   static const String signIn = '/signIn';
+  static const String signUp = '/signUp';
   static const String dashboard = '/dashboard';
   static const String transactionsHistory = '/transactionsHistory';
   static const String transactionDetail = '/transactions/:id';
@@ -36,6 +38,9 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.signIn,
         builder: (context, state) => const SignInScreen(),
+      ),
+      GoRoute(path: AppRoutes.signUp,
+        builder: (context, state) => const SignUpScreen(),
       ),
       GoRoute(
         path: AppRoutes.budget,

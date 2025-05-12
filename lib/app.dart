@@ -25,6 +25,7 @@ class _PersonalFinanceTrackerAppState extends State<PersonalFinanceTrackerApp> {
         ),
         BlocProvider<AuthCubit>(create: (_) => getIt<AuthCubit>()),
         BlocProvider<CategoryCubit>(create: (_) => getIt<CategoryCubit>()),
+
       ],
       child: MaterialApp.router(
         title: 'Personal Finance Tracker',

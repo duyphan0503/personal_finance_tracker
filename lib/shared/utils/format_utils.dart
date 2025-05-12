@@ -6,6 +6,11 @@ class FormatUtils {
     return DateFormat('MMM d, yyyy').format(date);
   }
 
+  static String formatDateSimple(DateTime? date) {
+    if (date == null) return '';
+    return DateFormat('M/d/yyyy').format(date);
+  }
+
   static String formatDateWithoutYear(DateTime? date) {
     if (date == null) return '';
     return DateFormat('MMM d').format(date);

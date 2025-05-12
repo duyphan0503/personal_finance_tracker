@@ -26,15 +26,16 @@ class AppRoutes {
   static const String selectCategory = '/selectCategory';
 
 }
-
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
   static final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
   // GoRouter configuration
   static final GoRouter router = GoRouter(
+
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.signIn,
+
     routes: [
       GoRoute(
         path: AppRoutes.signIn,

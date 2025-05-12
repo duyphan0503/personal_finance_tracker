@@ -1,0 +1,50 @@
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
+
+import '../../category/model/category_model.dart';
+import '../data/repository/budget_repository.dart';
+import '../model/budget_model.dart';
+
+part 'budget_state.dart';
+
+@injectable
+class BudgetCubit extends Cubit<BudgetState> {
+  final BudgetRepository _repository;
+
+  BudgetCubit(this._repository) : super(BudgetInitial());
+
+  Future<void> fetchCategories() async {
+    try {
+      emit(BudgetLoading());
+      final categories = await _repository.fetchCategories();
+      emit(categories.isEmpty
+          ? BudgetEmpty()
+          : BudgetLoaded(categories));
+    } catch (e) {
+      emit(BudgetError('Failed to load categories: ${e.toString()}'));
+      rethrow; // Giữ nguyên lỗi để có thể xử lý ở tầng UI nếu cần
+    }
+  }
+
+  Future<void> saveBudget(double amount, String categoryId) async {
+    try {
+      if (amount <= 0) {
+        emit(BudgetError('Amount must be greater than 0'));
+        return;
+      }
+
+      emit(BudgetSaving());
+      final budget = BudgetModel(
+        id: '', // ID sẽ được tạo tự động bởi Supabase
+        categoryId: categoryId,
+        amount: amount,
+      );
+      await _repository.saveBudget(budget);
+      emit(BudgetSaved());
+      fetchCategories(); // Refresh danh sách sau khi lưu
+    } catch (e) {
+      emit(BudgetError('Failed to save budget: ${e.toString()}'));
+      rethrow;
+    }
+  }
+}

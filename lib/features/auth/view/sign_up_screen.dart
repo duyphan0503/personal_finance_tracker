@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/routes/app_routes.dart';
+import 'package:personal_finance_tracker/shared/services/notification_service.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
@@ -11,37 +12,40 @@ import '../../../shared/widgets/auth_text_field.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
+    _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  void _signIn() {
-    if (_formKey.currentState?.validate() ?? false) {
-      context.read<AuthCubit>().signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
-    }
+  void _togglePassword() {
+    setState(() => _obscurePassword = !_obscurePassword);
   }
 
-  void _goToSignUp() {
-    context.go(AppRoutes.signUp);
+  void _signUp() {
+    if (_formKey.currentState?.validate() ?? false) {
+      context.read<AuthCubit>().signUpWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+        fullName: _fullNameController.text,
+      );
+    }
   }
 
   @override
@@ -50,18 +54,17 @@ class _SignInScreenState extends State<SignInScreen> {
       backgroundColor: AppColors.background,
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
-          if (state.status == AuthStatus.error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage ?? 'An error occurred'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          } else if (state.status == AuthStatus.authenticated) {
+          if (state.status == AuthStatus.authenticated) {
             context.go(AppRoutes.dashboard);
+          } else if (state.status == AuthStatus.error) {
+            NotificationService.showError(
+              state.errorMessage ?? 'An error occurred during signup',
+            );
           }
         },
         builder: (context, state) {
+          final bool isLoading = state.status == AuthStatus.loading;
+
           return SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -69,29 +72,37 @@ class _SignInScreenState extends State<SignInScreen> {
                 child: Form(
                   key: _formKey,
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        'Welcome to Personal\nFinance Tracker',
-                        textAlign: TextAlign.center,
+                        "Sign Up",
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: 34,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryVariant,
-                          letterSpacing: -0.5,
+                          letterSpacing: -1,
                         ),
                       ),
-                      const SizedBox(height: 24),
-                      // Illustration
+                      const SizedBox(height: 22),
                       SizedBox(
                         height: 190,
                         child: Image.asset(
-                          Assets.images.signIn.path,
+                          Assets.images.signUp.path,
                           fit: BoxFit.contain,
                         ),
                       ),
                       const SizedBox(height: 28),
-                      // Email
+                      AuthTextField(
+                        controller: _fullNameController,
+                        hintText: "Full Name",
+                        textInputAction: TextInputAction.next,
+                        validator:
+                            (value) => Validators.required(
+                              value,
+                              fieldName: 'full name',
+                            ),
+                      ),
+                      const SizedBox(height: 16),
                       AuthTextField(
                         controller: _emailController,
                         hintText: "Email",
@@ -100,7 +111,6 @@ class _SignInScreenState extends State<SignInScreen> {
                         validator: Validators.email,
                       ),
                       const SizedBox(height: 16),
-                      // Password
                       AuthTextField(
                         controller: _passwordController,
                         hintText: "Password",
@@ -112,26 +122,16 @@ class _SignInScreenState extends State<SignInScreen> {
                                 : Icons.visibility,
                             color: Colors.grey[400],
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
+                          onPressed: _togglePassword,
                         ),
                         textInputAction: TextInputAction.done,
                         validator: Validators.password,
-                        onFieldSubmitted: (_) => _signIn(),
                       ),
                       const SizedBox(height: 30),
-                      // Login Button
                       SizedBox(
                         width: double.infinity,
                         height: 54,
                         child: ElevatedButton(
-                          onPressed:
-                              state.status == AuthStatus.loading
-                                  ? null
-                                  : _signIn,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryButton,
                             shape: RoundedRectangleBorder(
@@ -139,8 +139,9 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                             elevation: 0,
                           ),
+                          onPressed: isLoading ? null : _signUp,
                           child:
-                              state.status == AuthStatus.loading
+                              isLoading
                                   ? const SizedBox(
                                     width: 24,
                                     height: 24,
@@ -150,17 +151,17 @@ class _SignInScreenState extends State<SignInScreen> {
                                     ),
                                   )
                                   : const Text(
-                                    "Login",
+                                    "Sign Up",
                                     style: AppTypography.h3,
                                   ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 22),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           const Text(
-                            "Don't have an account?",
+                            "Already have an account?",
                             style: TextStyle(
                               color: AppColors.primaryVariant,
                               fontSize: 17,
@@ -168,9 +169,11 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                           ),
                           TextButton(
-                            onPressed: _goToSignUp,
+                            onPressed: () {
+                              context.go(AppRoutes.signIn);
+                            },
                             child: const Text(
-                              "Sign Up",
+                              "Login",
                               style: TextStyle(
                                 color: AppColors.primaryButton,
                                 fontSize: 17,
@@ -180,7 +183,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),

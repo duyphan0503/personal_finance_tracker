@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/features/auth/view/sign_in_screen.dart';
+import 'package:personal_finance_tracker/features/budget/view/budget_screen.dart';
+import 'package:personal_finance_tracker/features/report/view/report_summary_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/transaction_history_screen.dart';
 
 import '../features/dashboard/view/dashboard_screen.dart';
@@ -12,8 +14,11 @@ class AppRoutes {
   static const String transactionsHistory = '/transactionsHistory';
   static const String transactionDetail = '/transactions/:id';
   static const String addTransaction = '/transactions/add';
+
   static const String report = '/report';
   static const String settings = '/settings';
+  static const String budget = '/budget';
+  static const String reportSummary = '/report-summary';
 }
 
 class AppRouter {
@@ -28,6 +33,14 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.signIn,
         builder: (context, state) => const SignInScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.budget,
+        builder: (context, state) => BudgetScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.reportSummary,
+        builder: (context, state) => ReportSummaryScreen(),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,

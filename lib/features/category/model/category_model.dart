@@ -1,15 +1,14 @@
+import 'package:injectable/injectable.dart';
+
 enum CategoryType { income, expense }
 
+@injectable
 class CategoryModel {
   final String id;
   final String name;
   final CategoryType type;
 
-  CategoryModel({
-    required this.id,
-    required this.name,
-    required this.type,
-  });
+  CategoryModel({required this.id, required this.name, required this.type});
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) {
     return CategoryModel(
@@ -20,10 +19,7 @@ class CategoryModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'type': type.toString().split('.').last,
-    };
+    return {'name': name, 'type': type.toString().split('.').last};
   }
 
   static CategoryType categoryTypeFromString(String? typeStr) {

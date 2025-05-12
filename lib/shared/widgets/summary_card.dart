@@ -12,8 +12,8 @@ class SummaryCard extends StatelessWidget {
     required this.title,
     required this.value,
     required this.color,
-    this.width = 105,
-    this.height = 72,
+    this.width = 120,
+    this.height = 80,
   });
 
   @override
@@ -23,7 +23,7 @@ class SummaryCard extends StatelessWidget {
       height: height,
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -32,7 +32,7 @@ class SummaryCard extends StatelessWidget {
             title,
             style: const TextStyle(
               color: Colors.white,
-              fontWeight: FontWeight.w600,
+              fontWeight: FontWeight.bold,
               fontSize: 15,
               letterSpacing: 1,
             ),

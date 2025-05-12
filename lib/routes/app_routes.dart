@@ -5,6 +5,7 @@ import 'package:personal_finance_tracker/features/auth/view/sign_up_screen.dart'
 import 'package:personal_finance_tracker/features/category/view/select_category_screen.dart';
 import 'package:personal_finance_tracker/features/budget/view/budget_screen.dart';
 import 'package:personal_finance_tracker/features/report/view/report_summary_screen.dart';
+import 'package:personal_finance_tracker/features/transaction/view/add_transaction_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/transaction_history_screen.dart';
 
 import '../features/dashboard/view/dashboard_screen.dart';
@@ -67,7 +68,7 @@ class AppRouter {
           ),
           GoRoute(
             path: AppRoutes.addTransaction,
-            builder: (context, state) => const Placeholder(),
+            builder: (context, state) => const AddTransactionScreen(),
           ),
           GoRoute(
             path: AppRoutes.transactionsHistory,

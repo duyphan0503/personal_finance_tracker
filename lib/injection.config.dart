@@ -48,11 +48,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i454.SupabaseClient>(
       () => registerSupabaseModule.supabaseClient,
     );
-    gh.lazySingleton<_i114.TransactionRemoteDataSource>(
-      () => _i114.TransactionRemoteDataSource(gh<_i454.SupabaseClient>()),
-    );
     gh.lazySingleton<_i589.CategoryRemoteDataSource>(
       () => _i589.CategoryRemoteDataSource(gh<_i454.SupabaseClient>()),
+    );
+    gh.lazySingleton<_i114.TransactionRemoteDataSource>(
+      () => _i114.TransactionRemoteDataSource(gh<_i454.SupabaseClient>()),
     );
     gh.lazySingleton<_i125.CategoryRepository>(
       () => _i125.CategoryRepository(gh<_i589.CategoryRemoteDataSource>()),

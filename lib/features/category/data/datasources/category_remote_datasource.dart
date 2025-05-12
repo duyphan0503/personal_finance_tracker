@@ -39,7 +39,7 @@ class CategoryRemoteDataSource {
       case 'investments':
         return Icons.trending_up;
       default:
-        return Icons.category;
+        return Icons.people;
     }
   }
 
@@ -58,7 +58,7 @@ class CategoryRemoteDataSource {
       case 'investments':
         return Colors.indigo;
       default:
-        return Colors.grey;
+        return Colors.indigo;
     }
   }
 }

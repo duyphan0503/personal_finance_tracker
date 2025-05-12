@@ -8,7 +8,7 @@ class CategoryRemoteDataSource {
   final SupabaseClient _client;
 
   CategoryRemoteDataSource(SupabaseClient? client)
-      : _client = client ?? Supabase.instance.client;
+    : _client = client ?? Supabase.instance.client;
 
   Future<List<CategoryModel>> fetchCategories() async {
     try {
@@ -16,7 +16,6 @@ class CategoryRemoteDataSource {
           .from('categories')
           .select()
           .order('name', ascending: true);
-
 
       return (res as List).map((data) => CategoryModel.fromJson(data)).toList();
     } catch (e) {
@@ -37,7 +36,7 @@ class CategoryRemoteDataSource {
         return Icons.money_outlined;
       case 'freelance':
         return Icons.work;
-      case 'investment':
+      case 'investments':
         return Icons.trending_up;
       default:
         return Icons.category;
@@ -55,9 +54,9 @@ class CategoryRemoteDataSource {
       case 'salary':
         return Colors.teal;
       case 'freelance':
-        return Colors.blue;
+        return Colors.orange;
       case 'investments':
-        return Colors.green;
+        return Colors.indigo;
       default:
         return Colors.grey;
     }

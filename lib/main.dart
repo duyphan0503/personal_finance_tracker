@@ -12,7 +12,7 @@ void main() async {
   await initSupabase();
   configureDependencies();
   await getIt<AuthRepository>().initAuthListener();
-  await getIt<AuthCubit>().signOut();
+  /*await getIt<AuthCubit>().signOut();*/
 
   runApp(const PersonalFinanceTrackerApp());
 }

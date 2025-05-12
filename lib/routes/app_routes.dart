@@ -22,7 +22,7 @@ class AppRoutes {
 
   // GoRouter configuration
   static final GoRouter router = GoRouter(
-    initialLocation: transactions,
+    initialLocation: budget,
     debugLogDiagnostics: true,
     routes: [
       GoRoute(

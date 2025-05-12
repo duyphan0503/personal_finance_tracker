@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:personal_finance_tracker/features/auth/cubit/auth_state.dart';
 
 import '../data/repositories/auth_repository.dart';
+import 'auth_state.dart';
 
 @injectable
 class AuthCubit extends Cubit<AuthState> {
@@ -12,8 +12,8 @@ class AuthCubit extends Cubit<AuthState> {
   StreamSubscription? _authStateSubscription;
 
   AuthCubit({required AuthRepository authRepository})
-      : _authRepository = authRepository,
-        super(const AuthState()) {
+    : _authRepository = authRepository,
+      super(const AuthState()) {
     _checkCurrentUser();
   }
 
@@ -26,10 +26,9 @@ class AuthCubit extends Cubit<AuthState> {
         emit(state.copyWith(status: AuthStatus.unauthenticated));
       }
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(status: AuthStatus.error, errorMessage: e.toString()),
+      );
     }
   }
 
@@ -45,21 +44,53 @@ class AuthCubit extends Cubit<AuthState> {
       );
 
       if (response.user != null) {
-        emit(state.copyWith(
-          status: AuthStatus.authenticated,
-          user: response.user,
-        ));
+        emit(
+          state.copyWith(status: AuthStatus.authenticated, user: response.user),
+        );
       } else {
-        emit(state.copyWith(
-          status: AuthStatus.unauthenticated,
-          errorMessage: 'Failed to sign in',
-        ));
+        emit(
+          state.copyWith(
+            status: AuthStatus.unauthenticated,
+            errorMessage: 'Failed to sign in',
+          ),
+        );
       }
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(status: AuthStatus.error, errorMessage: e.toString()),
+      );
+    }
+  }
+
+  Future<void> signUpWithEmailAndPassword({
+    required String email,
+    required String password,
+    required String fullName,
+  }) async {
+    emit(state.copyWith(status: AuthStatus.loading));
+    try {
+      final response = await _authRepository.signUpWithEmailAndPassword(
+        email: email,
+        password: password,
+        fullName: fullName,
+      );
+
+      if (response.user != null) {
+        emit(
+          state.copyWith(status: AuthStatus.authenticated, user: response.user),
+        );
+      } else {
+        emit(
+          state.copyWith(
+            status: AuthStatus.unauthenticated,
+            errorMessage: 'Failed to sign up',
+          ),
+        );
+      }
+    } catch (e) {
+      emit(
+        state.copyWith(status: AuthStatus.error, errorMessage: e.toString()),
+      );
     }
   }
 
@@ -68,10 +99,9 @@ class AuthCubit extends Cubit<AuthState> {
       await _authRepository.signOut();
       emit(state.copyWith(status: AuthStatus.unauthenticated, user: null));
     } catch (e) {
-      emit(state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.toString(),
-      ));
+      emit(
+        state.copyWith(status: AuthStatus.error, errorMessage: e.toString()),
+      );
     }
   }
 

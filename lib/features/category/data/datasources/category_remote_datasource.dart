@@ -8,17 +8,20 @@ class CategoryRemoteDataSource {
   final SupabaseClient _client;
 
   CategoryRemoteDataSource(SupabaseClient? client)
-    : _client = client ?? Supabase.instance.client;
+      : _client = client ?? Supabase.instance.client;
 
   Future<List<CategoryModel>> fetchCategories() async {
     try {
-      final res = _client
+      final res = await _client
           .from('categories')
           .select()
           .order('name', ascending: true);
+
+
       return (res as List).map((data) => CategoryModel.fromJson(data)).toList();
     } catch (e) {
-      throw Exception('Failed to fetch categories: $e');
+      debugPrint('Error fetching categories: $e');
+      throw Exception('Failed to fetch categories: ${e.toString()}');
     }
   }
 
@@ -31,13 +34,13 @@ class CategoryRemoteDataSource {
       case 'housing':
         return Icons.home;
       case 'salary':
-        return Icons.money;
+        return Icons.money_outlined;
       case 'freelance':
         return Icons.work;
       case 'investment':
         return Icons.trending_up;
       default:
-        return Icons.people;
+        return Icons.category;
     }
   }
 
@@ -52,11 +55,11 @@ class CategoryRemoteDataSource {
       case 'salary':
         return Colors.teal;
       case 'freelance':
-        return Colors.orange;
-      case 'investment':
-        return Colors.indigo;
+        return Colors.blue;
+      case 'investments':
+        return Colors.green;
       default:
-        return Colors.indigo;
+        return Colors.grey;
     }
   }
 }

@@ -17,6 +17,14 @@ import 'package:personal_finance_tracker/features/auth/data/datasources/auth_rem
     as _i387;
 import 'package:personal_finance_tracker/features/auth/data/repositories/auth_repository.dart'
     as _i441;
+import 'package:personal_finance_tracker/features/budget/cubit/budget_cubit.dart'
+    as _i540;
+import 'package:personal_finance_tracker/features/budget/data/datasources/budget_remote_datasource.dart'
+    as _i417;
+import 'package:personal_finance_tracker/features/budget/data/repository/budget_repository.dart'
+    as _i480;
+import 'package:personal_finance_tracker/features/budget/model/budget_model.dart'
+    as _i755;
 import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart'
     as _i688;
 import 'package:personal_finance_tracker/features/category/data/datasources/category_remote_datasource.dart'
@@ -27,6 +35,12 @@ import 'package:personal_finance_tracker/features/category/model/category_model.
     as _i800;
 import 'package:personal_finance_tracker/features/dashboard/cubit/dashboard_cubit.dart'
     as _i988;
+import 'package:personal_finance_tracker/features/report/cubit/report_summary_cubit.dart'
+    as _i817;
+import 'package:personal_finance_tracker/features/report/data/datasources/report_summary_remote_datasource.dart'
+    as _i826;
+import 'package:personal_finance_tracker/features/report/data/repository/report_summary_repository.dart'
+    as _i1044;
 import 'package:personal_finance_tracker/features/transaction/cubit/transaction_cubit.dart'
     as _i716;
 import 'package:personal_finance_tracker/features/transaction/data/datasources/transaction_remote_datasource.dart'
@@ -50,11 +64,29 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i454.SupabaseClient>(
       () => registerSupabaseModule.supabaseClient,
     );
+    gh.factory<_i800.CategoryModel>(
+      () => _i800.CategoryModel(
+        id: gh<String>(),
+        name: gh<String>(),
+        type: gh<_i800.CategoryType>(),
+      ),
+    );
+    gh.factory<_i755.BudgetModel>(
+      () => _i755.BudgetModel(
+        id: gh<String>(),
+        categoryId: gh<String>(),
+        amount: gh<double>(),
+        category: gh<_i800.CategoryModel>(),
+      ),
+    );
     gh.lazySingleton<_i114.TransactionRemoteDataSource>(
       () => _i114.TransactionRemoteDataSource(gh<_i454.SupabaseClient>()),
     );
     gh.lazySingleton<_i589.CategoryRemoteDataSource>(
       () => _i589.CategoryRemoteDataSource(gh<_i454.SupabaseClient>()),
+    );
+    gh.lazySingleton<_i826.ReportSummaryRemoteDataSource>(
+      () => _i826.ReportSummaryRemoteDataSource(gh<_i454.SupabaseClient>()),
     );
     gh.lazySingleton<_i125.CategoryRepository>(
       () => _i125.CategoryRepository(gh<_i589.CategoryRemoteDataSource>()),
@@ -62,6 +94,20 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1067.TransactionRepository>(
       () =>
           _i1067.TransactionRepository(gh<_i114.TransactionRemoteDataSource>()),
+    );
+    gh.lazySingleton<_i1044.ReportSummaryRepository>(
+      () => _i1044.ReportSummaryRepository(
+        gh<_i826.ReportSummaryRemoteDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i417.BudgetRemoteDataSource>(
+      () => _i417.BudgetRemoteDataSource(
+        gh<_i454.SupabaseClient>(),
+        gh<_i589.CategoryRemoteDataSource>(),
+      ),
+    );
+    gh.factory<_i817.ReportSummaryCubit>(
+      () => _i817.ReportSummaryCubit(gh<_i1044.ReportSummaryRepository>()),
     );
     gh.factory<_i988.DashboardCubit>(
       () => _i988.DashboardCubit(gh<_i1067.TransactionRepository>()),
@@ -91,6 +137,15 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i441.AuthRepository>(
       () => _i441.AuthRepository(dataSource: gh<_i387.AuthRemoteDataSource>()),
+    );
+    gh.factory<_i480.BudgetRepository>(
+      () => _i480.BudgetRepository(
+        gh<_i417.BudgetRemoteDataSource>(),
+        gh<_i589.CategoryRemoteDataSource>(),
+      ),
+    );
+    gh.factory<_i540.BudgetCubit>(
+      () => _i540.BudgetCubit(gh<_i480.BudgetRepository>()),
     );
     gh.factory<_i909.AuthCubit>(
       () => _i909.AuthCubit(authRepository: gh<_i441.AuthRepository>()),

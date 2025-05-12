@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:personal_finance_tracker/config/theme/app_colors.dart';
 import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart';
 import 'package:personal_finance_tracker/features/dashboard/cubit/dashboard_cubit.dart';
 import 'package:personal_finance_tracker/features/dashboard/cubit/dashboard_state.dart';
@@ -46,11 +47,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
         final double totalIncome = state.totalIncome;
         final double totalExpenses = state.totalExpenses;
-        final double totalAll = totalIncome + totalExpenses;
+        final double totalAll = totalIncome + totalExpenses + _getBalance();
         final double incomePercent =
-            totalAll <= 0 ? 50 : (totalIncome / totalAll) * 100;
+            totalAll == 0 ? 0 : (totalIncome / totalAll) * 100;
         final double expensesPercent =
-            totalAll <= 0 ? 50 : (totalExpenses / totalAll) * 100;
+            totalAll == 0 ? 0 : (totalExpenses / totalAll) * 100;
+        final double balancePercent =
+            totalAll == 0 ? 0 : (_getBalance() / totalAll) * 100;
 
         return Scaffold(
           body: SafeArea(
@@ -76,25 +79,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     children: [
                       SummaryCard(
                         title: 'INCOME',
-                        value: '$totalIncome',
-                        color: Colors.greenAccent,
+                        value: FormatUtils.formatCurrency(totalIncome),
+                        color: AppColors.incomeColor,
                       ),
                       SummaryCard(
                         title: 'EXPENSES',
-                        value: '$totalExpenses',
-                        color: Colors.orangeAccent,
+                        value: FormatUtils.formatCurrency(totalExpenses),
+                        color: AppColors.expenseColor,
                       ),
                       SummaryCard(
                         title: 'BALANCE',
-                        value: '${_getBalance()}',
-                        color: Colors.teal,
+                        value: FormatUtils.formatCurrency(_getBalance()),
+                        color: AppColors.balanceColor,
                       ),
                     ],
                   ),
                   const SizedBox(height: 30),
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      const SizedBox(width: 10),
                       SizedBox(
                         width: 140,
                         height: 140,
@@ -105,26 +109,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             startDegreeOffset: -90,
                             sections: [
                               PieChartSectionData(
-                                color: Colors.greenAccent,
+                                color: AppColors.incomeColor,
                                 value:
                                     incomePercent.isFinite ? incomePercent : 50,
                                 title: '',
-                                radius: 30,
+                                radius: 35,
                               ),
                               PieChartSectionData(
-                                color: Colors.orangeAccent,
+                                color: AppColors.expenseColor,
                                 value:
                                     expensesPercent.isFinite
                                         ? expensesPercent
                                         : 50,
                                 title: '',
-                                radius: 30,
+                                radius: 35,
                               ),
                               PieChartSectionData(
-                                color: Colors.teal,
-                                value: _getBalance(),
+                                color: AppColors.balanceColor,
+                                value: balancePercent,
                                 title: '',
-                                radius: 30,
+                                radius: 35,
                               ),
                             ],
                           ),
@@ -134,10 +138,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _LegendItem(color: Colors.teal, text: 'Income'),
+                          _LegendItem(
+                            color: AppColors.incomeColor,
+                            text: 'Income',
+                          ),
                           const SizedBox(height: 10),
                           _LegendItem(
-                            color: Colors.orangeAccent,
+                            color: AppColors.expenseColor,
                             text: 'Expenses',
                           ),
                         ],
@@ -179,19 +186,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               state.recentTransactions[index].amount,
                               showDecimals: false,
                             ),
-                            subTrailing:
-                                state
-                                            .recentTransactions[index]
-                                            .category!
-                                            .type
-                                            .name ==
-                                        'income'
-                                    ? '+${state.recentTransactions[index].amount}'
-                                    : '-${state.recentTransactions[index].amount}',
+                            subTrailing: FormatUtils.formatCurrency(
+                              state.recentTransactions[index].amount,
+                              showDecimals: false,
+                            ),
                             iconLeadingStyle: IconThemeData(
                               color: _categoryCubit.getCategoryIconColor(
                                 state.recentTransactions[index].category!.name,
                               ),
+                              size: 40,
                             ),
                           ),
                           if (index != state.recentTransactions.length - 1)
@@ -228,10 +231,10 @@ class _LegendItem extends StatelessWidget {
       children: [
         Container(
           width: 17,
-          height: 30,
+          height: 35,
           decoration: BoxDecoration(
             color: color,
-            borderRadius: BorderRadius.circular(4),
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
         const SizedBox(width: 10),

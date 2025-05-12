@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart';
 import 'package:personal_finance_tracker/features/category/model/category_model.dart';
 import '../cubit/category_state.dart';
@@ -107,10 +108,9 @@ class _SelectCategoryScreenState extends State<SelectCategoryScreen> {
 
     return InkWell(
       onTap: () {
-        setState(() {
-          _selectedCategory = category;
+        Future.microtask(() {
+          context.pop(category);
         });
-        // Không chuyển trang, chỉ cập nhật giao diện
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),

@@ -34,7 +34,7 @@ class CategoryRemoteDataSource {
       case 'housing':
         return Icons.home;
       case 'salary':
-        return Icons.money;
+        return Icons.money_outlined;
       case 'freelance':
         return Icons.work;
       case 'investment':
@@ -51,12 +51,12 @@ class CategoryRemoteDataSource {
       case 'shopping':
         return Colors.indigo;
       case 'housing':
-        return Colors.brown;
+        return Colors.orange;
       case 'salary':
         return Colors.teal;
       case 'freelance':
         return Colors.blue;
-      case 'investment':
+      case 'investments':
         return Colors.green;
       default:
         return Colors.grey;

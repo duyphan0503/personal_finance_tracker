@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:personal_finance_tracker/config/theme/app_colors.dart';
 
 class TransactionTile extends StatelessWidget {
   final IconData? iconLeading;
@@ -6,6 +7,8 @@ class TransactionTile extends StatelessWidget {
   final String? subtitle;
   final String? trailing;
   final String? subTrailing;
+  final EdgeInsetsGeometry margin;
+  final bool showBorder;
 
   final IconThemeData? iconLeadingStyle;
   final TextStyle? titleStyle;
@@ -20,6 +23,8 @@ class TransactionTile extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.subTrailing,
+    this.margin = const EdgeInsets.symmetric(vertical: 8),
+    this.showBorder = true,
     this.iconLeadingStyle,
     this.titleStyle,
     this.subtitleStyle,
@@ -30,13 +35,16 @@ class TransactionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 1),
+      margin: margin,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(width: 1, color: Colors.grey.shade300),
+        side:
+            showBorder
+                ? BorderSide(width: 2, color: Colors.grey.shade300)
+                : BorderSide.none,
       ),
-      color: Colors.white,
+      color: AppColors.background,
       child: ListTile(
         leading:
             iconLeading != null
@@ -48,8 +56,9 @@ class TransactionTile extends StatelessWidget {
                       Theme.of(context).iconTheme.color,
                 )
                 : null,
+        minVerticalPadding: 12,
         title: Padding(
-          padding: const EdgeInsets.only(top: 8),
+          padding: const EdgeInsets.only(top: 4),
           child: Text(
             title,
             style:

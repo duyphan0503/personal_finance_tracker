@@ -186,10 +186,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               state.recentTransactions[index].amount,
                               showDecimals: false,
                             ),
-                            subTrailing: FormatUtils.formatCurrency(
-                              state.recentTransactions[index].amount,
-                              showDecimals: false,
-                            ),
+                            margin: EdgeInsets.zero,
+                            showBorder: false,
                             iconLeadingStyle: IconThemeData(
                               color: _categoryCubit.getCategoryIconColor(
                                 state.recentTransactions[index].category!.name,

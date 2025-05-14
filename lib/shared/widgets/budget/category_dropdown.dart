@@ -1,42 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:personal_finance_tracker/features/category/model/category_model.dart';
 
+import '../../../features/category/data/datasources/category_remote_datasource.dart';
+
 class CategoryDropdown extends StatelessWidget {
-  final List<CategoryModel> categories; // Thay vì List<String>, dùng List<CategoryModel>
+  final List<CategoryModel> categories;
   final CategoryModel? selectedCategory;
   final Function(CategoryModel?) onChanged;
-  final IconData categoryIcon;
-  final Color iconColor;
+  final CategoryRemoteDataSource dataSource;
 
   const CategoryDropdown({
     super.key,
     required this.categories,
     required this.selectedCategory,
     required this.onChanged,
-    required this.categoryIcon,
-    required this.iconColor
+    required this.dataSource,
   });
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity, // Chiếm toàn bộ chiều ngang
-      padding: const EdgeInsets.symmetric(horizontal: 12), // Thêm padding nếu cần
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.grey),
         borderRadius: BorderRadius.circular(8),
       ),
       child: DropdownButton<CategoryModel>(
-        isExpanded: true, // Quan trọng: giúp dropdown mở rộng theo container
+        isExpanded: true,
         value: selectedCategory,
         onChanged: onChanged,
+        hint: const Text('Select Category'),
         items: categories.map((category) {
           return DropdownMenuItem<CategoryModel>(
             value: category,
             child: Row(
               children: [
                 Icon(
-                  categoryIcon,
-                  color: iconColor,
+                  dataSource.getCategoryIcon(category.name),
+                  color: dataSource.getCategoryIconTheme(category.name),
                 ),
                 const SizedBox(width: 8),
                 Text(category.name),

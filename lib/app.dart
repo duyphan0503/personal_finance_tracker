@@ -8,6 +8,7 @@ import 'package:personal_finance_tracker/features/report/cubit/report_summary_cu
 import 'package:personal_finance_tracker/features/transaction/cubit/transaction_cubit.dart';
 import 'package:personal_finance_tracker/injection.dart';
 import 'package:personal_finance_tracker/routes/app_routes.dart';
+import 'package:personal_finance_tracker/shared/services/notification_service.dart';
 
 import 'features/budget/cubit/budget_cubit.dart';
 
@@ -36,6 +37,7 @@ class _PersonalFinanceTrackerAppState extends State<PersonalFinanceTrackerApp> {
         ),
       ],
       child: MaterialApp.router(
+        scaffoldMessengerKey: NotificationService.messengerKey,
         title: 'Personal Finance Tracker',
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,

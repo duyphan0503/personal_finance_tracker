@@ -24,7 +24,7 @@ class AppRoutes {
   static const String budget = '/budget';
   static const String reportSummary = '/report-summary';
   static const String selectCategory = '/selectCategory';
-
+  static const String accountSecurity = '/accountSecurity';
 }
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -45,12 +45,8 @@ class AppRouter {
         builder: (context, state) => const SignUpScreen(),
       ),
       GoRoute(
-        path: AppRoutes.budget,
-        builder: (context, state) => BudgetScreen(),
-      ),
-      GoRoute(
         path: AppRoutes.reportSummary,
-        builder: (context, state) => ReportSummaryScreen(),
+        builder: (context, state) => const ReportSummaryScreen(),
       ),
       GoRoute(
         path: AppRoutes.selectCategory,
@@ -75,8 +71,8 @@ class AppRouter {
             builder: (context, state) => const TransactionHistoryScreen(),
           ),
           GoRoute(
-            path: AppRoutes.report,
-            builder: (context, state) => const Placeholder(),
+            path: AppRoutes.budget,
+            builder: (context, state) => const BudgetScreen(),
           ),
           GoRoute(
             path: AppRoutes.settings,
@@ -131,7 +127,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
     if (location.startsWith(AppRoutes.dashboard)) return 0;
     if (location.startsWith(AppRoutes.addTransaction)) return 1;
     if (location.startsWith(AppRoutes.transactionsHistory)) return 2;
-    if (location.startsWith(AppRoutes.report)) return 3;
+    if (location.startsWith(AppRoutes.budget)) return 3;
     if (location.startsWith(AppRoutes.settings)) return 4;
     return 0;
   }
@@ -148,7 +144,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
         context.go(AppRoutes.transactionsHistory);
         break;
       case 3:
-        context.go(AppRoutes.report);
+        context.go(AppRoutes.budget);
         break;
       case 4:
         context.go(AppRoutes.settings);

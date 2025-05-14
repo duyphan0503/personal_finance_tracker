@@ -35,10 +35,16 @@ import 'package:personal_finance_tracker/features/category/model/category_model.
     as _i800;
 import 'package:personal_finance_tracker/features/dashboard/cubit/dashboard_cubit.dart'
     as _i988;
+import 'package:personal_finance_tracker/features/report/cubit/report_cubit.dart'
+    as _i741;
 import 'package:personal_finance_tracker/features/report/cubit/report_summary_cubit.dart'
     as _i817;
+import 'package:personal_finance_tracker/features/report/data/datasources/report_remote_datasource.dart'
+    as _i330;
 import 'package:personal_finance_tracker/features/report/data/datasources/report_summary_remote_datasource.dart'
     as _i826;
+import 'package:personal_finance_tracker/features/report/data/repository/report_repository.dart'
+    as _i1070;
 import 'package:personal_finance_tracker/features/report/data/repository/report_summary_repository.dart'
     as _i1044;
 import 'package:personal_finance_tracker/features/transaction/cubit/transaction_cubit.dart'
@@ -88,6 +94,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i114.TransactionRemoteDataSource>(
       () => _i114.TransactionRemoteDataSource(gh<_i454.SupabaseClient>()),
     );
+    gh.lazySingleton<_i330.ReportRemoteDataSource>(
+      () => _i330.ReportRemoteDataSource(gh<_i454.SupabaseClient>()),
+    );
     gh.lazySingleton<_i125.CategoryRepository>(
       () => _i125.CategoryRepository(gh<_i589.CategoryRemoteDataSource>()),
     );
@@ -124,6 +133,9 @@ extension GetItInjectableX on _i174.GetIt {
         createdAt: gh<DateTime>(),
       ),
     );
+    gh.lazySingleton<_i1070.ReportRepository>(
+      () => _i1070.ReportRepository(gh<_i330.ReportRemoteDataSource>()),
+    );
     gh.lazySingleton<_i387.AuthRemoteDataSource>(
       () => _i387.AuthRemoteDataSource(
         supabaseClient: gh<_i454.SupabaseClient>(),
@@ -134,6 +146,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i688.CategoryCubit>(
       () => _i688.CategoryCubit(gh<_i125.CategoryRepository>()),
+    );
+    gh.factory<_i741.ReportCubit>(
+      () => _i741.ReportCubit(gh<_i1070.ReportRepository>()),
     );
     gh.lazySingleton<_i441.AuthRepository>(
       () => _i441.AuthRepository(dataSource: gh<_i387.AuthRemoteDataSource>()),

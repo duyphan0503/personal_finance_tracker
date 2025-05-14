@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/routes/app_routes.dart';
+import 'package:personal_finance_tracker/shared/services/notification_service.dart';
+import 'package:personal_finance_tracker/shared/widgets/input_text_field.dart';
 
+import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_typography.dart';
+import '../../../gen/assets.gen.dart';
+import '../../../shared/utils/validators.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
@@ -34,12 +41,14 @@ class _SignInScreenState extends State<SignInScreen> {
     }
   }
 
+  void _goToSignUp() {
+    context.go(AppRoutes.signUp);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sign In'),
-      ),
+      backgroundColor: AppColors.background,
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state.status == AuthStatus.error) {
@@ -50,61 +59,60 @@ class _SignInScreenState extends State<SignInScreen> {
               ),
             );
           } else if (state.status == AuthStatus.authenticated) {
-            AppRoutes.navigateTo(context, 'transactions');
+            context.go(AppRoutes.dashboard);
+            NotificationService.showSuccess('Logged in successfully!');
           }
         },
         builder: (context, state) {
           return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const SizedBox(height: 32),
-                    // Logo or app name
-                    const Center(
-                      child: Text(
-                        'Personal Finance Tracker',
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 28),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Welcome to Personal\nFinance Tracker',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 28,
                           fontWeight: FontWeight.bold,
+                          color: AppColors.primaryVariant,
+                          letterSpacing: -0.5,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 48),
-                    // Email field
-                    TextFormField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email),
-                        border: OutlineInputBorder(),
+                      const SizedBox(height: 24),
+                      // Illustration
+                      SizedBox(
+                        height: 190,
+                        child: Image.asset(
+                          Assets.images.signIn.path,
+                          fit: BoxFit.contain,
+                        ),
                       ),
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your email';
-                        }
-                        if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
-                          return 'Please enter a valid email';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    // Password field
-                    TextFormField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: const Icon(Icons.lock),
-                        border: const OutlineInputBorder(),
+                      const SizedBox(height: 28),
+                      // Email
+                      InputTextField(
+                        controller: _emailController,
+                        hintText: "Email",
+                        keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
+                        validator: Validators.email,
+                      ),
+                      const SizedBox(height: 16),
+                      // Password
+                      InputTextField(
+                        controller: _passwordController,
+                        hintText: "Password",
+                        obscureText: _obscurePassword,
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                            _obscurePassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey[400],
                           ),
                           onPressed: () {
                             setState(() {
@@ -112,53 +120,71 @@ class _SignInScreenState extends State<SignInScreen> {
                             });
                           },
                         ),
+                        textInputAction: TextInputAction.done,
+                        validator: Validators.password,
+                        onFieldSubmitted: (_) => _signIn(),
                       ),
-                      obscureText: _obscurePassword,
-                      textInputAction: TextInputAction.done,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
-                        }
-                        if (value.length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
-                        return null;
-                      },
-                      onFieldSubmitted: (_) => _signIn(),
-                    ),
-                    const SizedBox(height: 24),
-                    // Sign in button
-                    ElevatedButton(
-                      onPressed: state.status == AuthStatus.loading ? null : _signIn,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Theme.of(context).primaryColor,
-                        foregroundColor: Colors.white,
-                      ),
-                      child: state.status == AuthStatus.loading
-                          ? const SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
+                      const SizedBox(height: 30),
+                      // Login Button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 54,
+                        child: ElevatedButton(
+                          onPressed:
+                              state.status == AuthStatus.loading
+                                  ? null
+                                  : _signIn,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primaryButton,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
+                          ),
+                          child:
+                              state.status == AuthStatus.loading
+                                  ? const SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.8,
+                                    ),
+                                  )
+                                  : const Text(
+                                    "Login",
+                                    style: AppTypography.h3,
+                                  ),
                         ),
-                      )
-                          : const Text(
-                        'Sign In',
-                        style: TextStyle(fontSize: 16),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    // Forgot password option
-                    Center(
-                      child: TextButton(
-                        onPressed: () {
-                        },
-                        child: const Text('Forgot Password?'),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "Don't have an account?",
+                            style: TextStyle(
+                              color: AppColors.primaryVariant,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: _goToSignUp,
+                            child: const Text(
+                              "Sign Up",
+                              style: TextStyle(
+                                color: AppColors.primaryButton,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 10),
+                    ],
+                  ),
                 ),
               ),
             ),

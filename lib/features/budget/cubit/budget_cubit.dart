@@ -47,4 +47,13 @@ class BudgetCubit extends Cubit<BudgetState> {
       rethrow;
     }
   }
+
+  Future<BudgetModel?> getBudgetByCategory(String categoryId) async {
+    try {
+      return await _repository.getBudgetByCategory(categoryId);
+    } catch (e) {
+      emit(BudgetError('Failed to load budget: ${e.toString()}'));
+      return null;
+    }
+  }
 }

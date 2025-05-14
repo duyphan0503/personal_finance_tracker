@@ -12,13 +12,15 @@ class CategoryRemoteDataSource {
 
   Future<List<CategoryModel>> fetchCategories() async {
     try {
-      final res = _client
+      final res = await _client
           .from('categories')
           .select()
           .order('name', ascending: true);
+
       return (res as List).map((data) => CategoryModel.fromJson(data)).toList();
     } catch (e) {
-      throw Exception('Failed to fetch categories: $e');
+      debugPrint('Error fetching categories: $e');
+      throw Exception('Failed to fetch categories: ${e.toString()}');
     }
   }
 
@@ -31,10 +33,10 @@ class CategoryRemoteDataSource {
       case 'housing':
         return Icons.home;
       case 'salary':
-        return Icons.money;
+        return Icons.money_outlined;
       case 'freelance':
         return Icons.work;
-      case 'investment':
+      case 'investments':
         return Icons.trending_up;
       default:
         return Icons.people;
@@ -53,7 +55,7 @@ class CategoryRemoteDataSource {
         return Colors.teal;
       case 'freelance':
         return Colors.orange;
-      case 'investment':
+      case 'investments':
         return Colors.indigo;
       default:
         return Colors.indigo;

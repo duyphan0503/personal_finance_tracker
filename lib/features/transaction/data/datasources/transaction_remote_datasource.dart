@@ -56,7 +56,12 @@ class TransactionRemoteDataSource {
         'transaction_date': (date ?? DateTime.now()).toUtc().toIso8601String(),
         'user_id': currentUser.id,
       };
-      final res = await _client.from('transactions').insert(payload).single();
+      final res =
+          await _client
+              .from('transactions')
+              .insert(payload)
+              .select('*,categories(*)')
+              .single();
       return TransactionModel.fromJson(res);
     } catch (e) {
       throw Exception('Failed to create transaction: $e');

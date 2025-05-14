@@ -18,7 +18,7 @@ class AppColors {
   static const Color navy = Color(0xFF001F3F);
   static const Color orange = Color(0xFFFF851B);
 
-  static const Color inputBorder = Color(0xFFDFE2E7);
+  static const Color inputBorder = Color(0xFFF67A0A);
   static const Color divider = Color(0xFFE6E6F8);
   static const Color primaryButton = Color(0xFFF67A0A);
 

@@ -7,9 +7,9 @@ import 'package:personal_finance_tracker/features/budget/view/budget_screen.dart
 import 'package:personal_finance_tracker/features/category/view/select_category_screen.dart';
 import 'package:personal_finance_tracker/features/report/view/category_report_screen.dart';
 import 'package:personal_finance_tracker/features/report/view/report_summary_screen.dart';
+import 'package:personal_finance_tracker/features/settings/view/notification_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/add_transaction_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/transaction_history_screen.dart';
-
 import '../features/dashboard/view/dashboard_screen.dart';
 
 class AppRoutes {
@@ -82,7 +82,7 @@ class AppRouter {
           ),
           GoRoute(
             path: AppRoutes.notifications,
-            builder: (context, state) => const BudgetScreen(),
+            builder: (context, state) => const NotificationScreen(),
           ),
           GoRoute(
             path: AppRoutes.settings,

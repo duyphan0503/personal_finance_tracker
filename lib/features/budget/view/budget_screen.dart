@@ -111,6 +111,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
     }
   }
 
+// In the _saveBudget method, replace the existing implementation with:
   void _saveBudget() {
     if (_selectedCategory == null) {
       NotificationService.showError('Please select a category');
@@ -128,11 +129,14 @@ class _BudgetScreenState extends State<BudgetScreen> {
     context.read<BudgetCubit>().saveBudget(amount, _selectedCategory!.id)
         .then((_) {
       NotificationService.showSuccess('Budget saved successfully!');
+      Navigator.pop(context, false); // Pass 'false' to reset the Budget Limit
     })
         .catchError((e) {
       NotificationService.showError('Failed to save budget: $e');
     });
   }
+
+
 
   @override
   Widget build(BuildContext context) {

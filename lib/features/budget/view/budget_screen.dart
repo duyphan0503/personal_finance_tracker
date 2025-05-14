@@ -4,6 +4,7 @@ import 'package:personal_finance_tracker/features/category/cubit/category_cubit.
 import 'package:personal_finance_tracker/injection.dart';
 import 'package:personal_finance_tracker/shared/services/notification_service.dart';
 import 'package:personal_finance_tracker/shared/widgets/budget/category_dropdown.dart';
+import '../../category/data/datasources/category_remote_datasource.dart';
 import '../../category/model/category_model.dart';
 import '../cubit/budget_cubit.dart';
 
@@ -18,6 +19,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
   final TextEditingController _budgetController = TextEditingController();
   CategoryModel? _selectedCategory;
   late final CategoryCubit _categoryCubit;
+  double? _currentBudgetAmount;
 
   @override
   void initState() {
@@ -26,7 +28,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
     _budgetController.addListener(_updateBudgetDisplay);
     context.read<BudgetCubit>().fetchCategories();
     _categoryCubit.fetchCategories();
-
   }
 
   @override
@@ -37,6 +38,101 @@ class _BudgetScreenState extends State<BudgetScreen> {
   }
 
   void _updateBudgetDisplay() => setState(() {});
+
+  Future<void> _onCategoryChanged(CategoryModel? category) async {
+    setState(() {
+      _selectedCategory = category;
+      _currentBudgetAmount = null;
+    });
+
+    if (category != null) {
+      final budget = await context.read<BudgetCubit>().getBudgetByCategory(category.id);
+      if (budget != null && mounted) {
+        setState(() {
+          _currentBudgetAmount = budget.amount;
+          _budgetController.text = _formatCurrencyInputForDisplay(budget.amount.toString());
+        });
+      } else if (mounted) {
+        setState(() {
+          _budgetController.clear();
+        });
+      }
+    }
+  }
+
+  String _formatCurrency(String value) {
+    final number = double.tryParse(value.replaceAll(',', '')) ?? 0;
+    return number.toStringAsFixed(number.truncateToDouble() == number ? 0 : 2)
+        .replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+    );
+  }
+
+  String _formatCurrencyInputForDisplay(String value) {
+    final cleanValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
+    if (cleanValue.isEmpty) return '';
+
+    final number = double.tryParse(cleanValue) ?? 0;
+    return number.toStringAsFixed(number.truncateToDouble() == number ? 0 : 2)
+        .replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+    );
+  }
+
+  void _formatCurrencyInput(String value) {
+    final cleanValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
+    if (cleanValue.isEmpty) {
+      _budgetController.text = '';
+      return;
+    }
+
+    final dots = cleanValue.split('.').length - 1;
+    final sanitizedValue = dots > 1
+        ? cleanValue.replaceFirst('.', '').replaceAll('.', '')
+        : cleanValue;
+
+    final parts = sanitizedValue.split('.');
+    final integerPart = parts[0].replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+    );
+
+    final formatted = parts.length > 1
+        ? '$integerPart.${parts[1]}'
+        : integerPart;
+
+    if (formatted != _budgetController.text) {
+      _budgetController.value = TextEditingValue(
+        text: formatted,
+        selection: TextSelection.collapsed(offset: formatted.length),
+      );
+    }
+  }
+
+  void _saveBudget() {
+    if (_selectedCategory == null) {
+      NotificationService.showError('Please select a category');
+      return;
+    }
+
+    final cleanAmount = _budgetController.text.replaceAll(',', '');
+    final amount = double.tryParse(cleanAmount);
+
+    if (amount == null || amount <= 0) {
+      NotificationService.showError('Please enter a valid amount');
+      return;
+    }
+
+    context.read<BudgetCubit>().saveBudget(amount, _selectedCategory!.id)
+        .then((_) {
+      NotificationService.showSuccess('Budget saved successfully!');
+    })
+        .catchError((e) {
+      NotificationService.showError('Failed to save budget: $e');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,12 +168,11 @@ class _BudgetScreenState extends State<BudgetScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Amount Display
                 Center(
                   child: Text(
-                    _budgetController.text.isEmpty
-                        ? '\$0'
-                        : '\$${_formatCurrency(_budgetController.text)}',
+                    _currentBudgetAmount != null
+                        ? '\$${_formatCurrency(_currentBudgetAmount!.toString())}'
+                        : '\$${_budgetController.text.isEmpty ? '0' : _formatCurrency(_budgetController.text)}',
                     style: const TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
@@ -87,7 +182,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // Category Dropdown
                 const Text(
                   'Budget Category',
                   style: TextStyle(
@@ -106,13 +200,10 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     style: TextStyle(color: Colors.red),
                   )
                       : CategoryDropdown(
-                    iconColor: _categoryCubit.getCategoryIconColor("${_selectedCategory?.name}"),
                     categories: state.categories,
-                    onChanged: (category) {
-                      setState(() => _selectedCategory = category);
-                    },
-                    categoryIcon: _categoryCubit.getCategoryIcon("${_selectedCategory?.name}"),
+                    onChanged: _onCategoryChanged,
                     selectedCategory: _selectedCategory,
+                    dataSource: getIt<CategoryRemoteDataSource>(),
                   )
                 else if (state is BudgetError)
                     Text(
@@ -121,7 +212,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
                     ),
                 const SizedBox(height: 24),
 
-                // Monthly Budget Input
                 const Text(
                   'Monthly Budget',
                   style: TextStyle(
@@ -150,13 +240,12 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // Save Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: state is BudgetSaving ? null : _saveBudget,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF6B00), // Màu cam
+                      backgroundColor: const Color(0xFFFF6B00),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -180,73 +269,5 @@ class _BudgetScreenState extends State<BudgetScreen> {
         },
       ),
     );
-  }
-
-  String _formatCurrency(String value) {
-    final number = double.tryParse(value.replaceAll(',', '')) ?? 0;
-    return number.toStringAsFixed(number.truncateToDouble() == number ? 0 : 2)
-        .replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-    );
-  }
-
-  void _formatCurrencyInput(String value) {
-    final cleanValue = value.replaceAll(RegExp(r'[^0-9.]'), '');
-    if (cleanValue.isEmpty) {
-      _budgetController.text = '';
-      return;
-    }
-
-    // Xử lý trường hợp có nhiều dấu chấm
-    final dots = cleanValue.split('.').length - 1;
-    final sanitizedValue = dots > 1
-        ? cleanValue.replaceFirst('.', '').replaceAll('.', '')
-        : cleanValue;
-
-    final parts = sanitizedValue.split('.');
-    final integerPart = parts[0].replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
-    );
-
-    final formatted = parts.length > 1
-        ? '$integerPart.${parts[1]}'
-        : integerPart;
-
-    if (formatted != _budgetController.text) {
-      _budgetController.value = TextEditingValue(
-        text: formatted,
-        selection: TextSelection.collapsed(offset: formatted.length),
-      );
-    }
-  }
-
-  // Thêm biến này vào class _BudgetScreenState
-  bool _isUpdate = false;
-  // Sửa hàm _saveBudget
-  void _saveBudget() {
-    if (_selectedCategory == null) {
-      NotificationService.showError('Please select a category');
-      return;
-    }
-
-    final cleanAmount = _budgetController.text.replaceAll(',', '');
-    final amount = double.tryParse(cleanAmount);
-
-    if (amount == null || amount <= 0) {
-      NotificationService.showError('Please enter a valid amount');
-      return;
-    }
-
-    context.read<BudgetCubit>().saveBudget(amount, _selectedCategory!.id)
-        .then((_) {
-      NotificationService.showSuccess(
-          'Budget saved successfully!' // Đơn giản hóa thông báo
-      );
-    })
-        .catchError((e) {
-      NotificationService.showError('Failed to save budget: $e');
-    });
   }
 }

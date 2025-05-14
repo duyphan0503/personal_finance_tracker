@@ -5,6 +5,7 @@ import 'package:personal_finance_tracker/features/auth/view/sign_in_screen.dart'
 import 'package:personal_finance_tracker/features/auth/view/sign_up_screen.dart';
 import 'package:personal_finance_tracker/features/budget/view/budget_screen.dart';
 import 'package:personal_finance_tracker/features/category/view/select_category_screen.dart';
+import 'package:personal_finance_tracker/features/report/view/category_report_screen.dart';
 import 'package:personal_finance_tracker/features/report/view/report_summary_screen.dart';
 import 'package:personal_finance_tracker/features/settings/view/notification_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/add_transaction_screen.dart';
@@ -29,7 +30,6 @@ class AppRoutes {
   static const String accountSecurity = '/accountSecurity';
 
   static const String notifications = '/notifications';
-
 }
 
 class AppRouter {
@@ -77,8 +77,8 @@ class AppRouter {
             builder: (context, state) => const TransactionHistoryScreen(),
           ),
           GoRoute(
-            path: AppRoutes.budget,
-            builder: (context, state) => const BudgetScreen(),
+            path: AppRoutes.report,
+            builder: (context, state) => const CategoryReportScreen(),
           ),
           GoRoute(
             path: AppRoutes.notifications,
@@ -208,7 +208,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
         context.go(AppRoutes.transactionsHistory);
         break;
       case 3:
-        context.go(AppRoutes.budget);
+        context.go(AppRoutes.report);
         break;
       case 4:
         context.go(AppRoutes.notifications);

@@ -26,6 +26,9 @@ class AppRoutes {
   static const String budget = '/budget';
   static const String reportSummary = '/report-summary';
   static const String selectCategory = '/selectCategory';
+
+  static const String accountSecurity = '/accountSecurity';
+
   static const String notifications = '/notifications';
 }
 
@@ -48,12 +51,8 @@ class AppRouter {
         builder: (context, state) => const SignUpScreen(),
       ),
       GoRoute(
-        path: AppRoutes.budget,
-        builder: (context, state) => BudgetScreen(),
-      ),
-      GoRoute(
         path: AppRoutes.reportSummary,
-        builder: (context, state) => ReportSummaryScreen(),
+        builder: (context, state) => const ReportSummaryScreen(),
       ),
       GoRoute(
         path: AppRoutes.selectCategory,
@@ -83,7 +82,7 @@ class AppRouter {
           ),
           GoRoute(
             path: AppRoutes.notifications,
-            builder: (context, state) => const Placeholder(),
+            builder: (context, state) => const BudgetScreen(),
           ),
           GoRoute(
             path: AppRoutes.settings,
@@ -190,6 +189,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
     if (location.startsWith(AppRoutes.dashboard)) return 0;
     if (location.startsWith(AppRoutes.addTransaction)) return 1;
     if (location.startsWith(AppRoutes.transactionsHistory)) return 2;
+
     if (location.startsWith(AppRoutes.report)) return 3;
     if (location.startsWith(AppRoutes.notifications)) return 4;
     if (location.startsWith(AppRoutes.settings)) return 5;

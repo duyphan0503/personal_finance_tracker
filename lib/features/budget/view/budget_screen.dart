@@ -3,7 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart';
 import 'package:personal_finance_tracker/injection.dart';
 import 'package:personal_finance_tracker/shared/services/notification_service.dart';
-import 'package:personal_finance_tracker/shared/widgets/budget/category_dropdown.dart';
+import 'package:personal_finance_tracker/shared/widgets/category_dropdown.dart';
+
 import '../../category/data/datasources/category_remote_datasource.dart';
 import '../../category/model/category_model.dart';
 import '../cubit/budget_cubit.dart';
@@ -46,11 +47,15 @@ class _BudgetScreenState extends State<BudgetScreen> {
     });
 
     if (category != null) {
-      final budget = await context.read<BudgetCubit>().getBudgetByCategory(category.id);
+      final budget = await context.read<BudgetCubit>().getBudgetByCategory(
+        category.id,
+      );
       if (budget != null && mounted) {
         setState(() {
           _currentBudgetAmount = budget.amount;
-          _budgetController.text = _formatCurrencyInputForDisplay(budget.amount.toString());
+          _budgetController.text = _formatCurrencyInputForDisplay(
+            budget.amount.toString(),
+          );
         });
       } else if (mounted) {
         setState(() {
@@ -62,11 +67,12 @@ class _BudgetScreenState extends State<BudgetScreen> {
 
   String _formatCurrency(String value) {
     final number = double.tryParse(value.replaceAll(',', '')) ?? 0;
-    return number.toStringAsFixed(number.truncateToDouble() == number ? 0 : 2)
+    return number
+        .toStringAsFixed(number.truncateToDouble() == number ? 0 : 2)
         .replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]},',
-    );
+        );
   }
 
   String _formatCurrencyInputForDisplay(String value) {
@@ -74,11 +80,12 @@ class _BudgetScreenState extends State<BudgetScreen> {
     if (cleanValue.isEmpty) return '';
 
     final number = double.tryParse(cleanValue) ?? 0;
-    return number.toStringAsFixed(number.truncateToDouble() == number ? 0 : 2)
+    return number
+        .toStringAsFixed(number.truncateToDouble() == number ? 0 : 2)
         .replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (Match m) => '${m[1]},',
-    );
+        );
   }
 
   void _formatCurrencyInput(String value) {
@@ -89,19 +96,19 @@ class _BudgetScreenState extends State<BudgetScreen> {
     }
 
     final dots = cleanValue.split('.').length - 1;
-    final sanitizedValue = dots > 1
-        ? cleanValue.replaceFirst('.', '').replaceAll('.', '')
-        : cleanValue;
+    final sanitizedValue =
+        dots > 1
+            ? cleanValue.replaceFirst('.', '').replaceAll('.', '')
+            : cleanValue;
 
     final parts = sanitizedValue.split('.');
     final integerPart = parts[0].replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]},',
+      (Match m) => '${m[1]},',
     );
 
-    final formatted = parts.length > 1
-        ? '$integerPart.${parts[1]}'
-        : integerPart;
+    final formatted =
+        parts.length > 1 ? '$integerPart.${parts[1]}' : integerPart;
 
     if (formatted != _budgetController.text) {
       _budgetController.value = TextEditingValue(
@@ -125,13 +132,15 @@ class _BudgetScreenState extends State<BudgetScreen> {
       return;
     }
 
-    context.read<BudgetCubit>().saveBudget(amount, _selectedCategory!.id)
+    context
+        .read<BudgetCubit>()
+        .saveBudget(amount, _selectedCategory!.id)
         .then((_) {
-      NotificationService.showSuccess('Budget saved successfully!');
-    })
+          NotificationService.showSuccess('Budget saved successfully!');
+        })
         .catchError((e) {
-      NotificationService.showError('Failed to save budget: $e');
-    });
+          NotificationService.showError('Failed to save budget: $e');
+        });
   }
 
   @override
@@ -196,20 +205,20 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 else if (state is BudgetLoaded)
                   state.categories.isEmpty
                       ? const Text(
-                    'No categories available',
-                    style: TextStyle(color: Colors.red),
-                  )
+                        'No categories available',
+                        style: TextStyle(color: Colors.red),
+                      )
                       : CategoryDropdown(
-                    categories: state.categories,
-                    onChanged: _onCategoryChanged,
-                    selectedCategory: _selectedCategory,
-                    dataSource: getIt<CategoryRemoteDataSource>(),
-                  )
+                        categories: state.categories,
+                        onChanged: _onCategoryChanged,
+                        selectedCategory: _selectedCategory,
+                        dataSource: getIt<CategoryRemoteDataSource>(),
+                      )
                 else if (state is BudgetError)
-                    Text(
-                      'Error: ${state.message}',
-                      style: const TextStyle(color: Colors.red),
-                    ),
+                  Text(
+                    'Error: ${state.message}',
+                    style: const TextStyle(color: Colors.red),
+                  ),
                 const SizedBox(height: 24),
 
                 const Text(
@@ -232,7 +241,9 @@ class _BudgetScreenState extends State<BudgetScreen> {
                       borderSide: const BorderSide(color: Colors.grey),
                     ),
                     contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
                     filled: true,
                     fillColor: Colors.grey[50],
                   ),
@@ -251,16 +262,19 @@ class _BudgetScreenState extends State<BudgetScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                     ),
-                    child: state is BudgetSaving
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text(
-                      'Save',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child:
+                        state is BudgetSaving
+                            ? const CircularProgressIndicator(
+                              color: Colors.white,
+                            )
+                            : const Text(
+                              'Save',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                   ),
                 ),
               ],

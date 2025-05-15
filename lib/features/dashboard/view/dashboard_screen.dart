@@ -9,7 +9,7 @@ import 'package:personal_finance_tracker/shared/utils/format_utils.dart';
 import 'package:personal_finance_tracker/shared/widgets/summary_card.dart';
 
 import '../../../injection.dart';
-import '../../../shared/widgets/transactions/transaction_tile.dart';
+import '../../../shared/widgets/transaction_tile.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});

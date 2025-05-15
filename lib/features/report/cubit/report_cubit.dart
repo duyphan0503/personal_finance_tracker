@@ -109,7 +109,58 @@ class ReportCubit extends Cubit<ReportState> {
     List<TransactionModel> transactions,
     Map<String, dynamic> filter,
   ) {
-    return [];
+    // Tạo map {year: {month: {income, expense}}}
+    final Map<int, Map<int, double>> incomeMap = {};
+    final Map<int, Map<int, double>> expenseMap = {};
+
+    for (final t in transactions) {
+      final date = t.transactionDate;
+      final year = date.year;
+      final month = date.month;
+      incomeMap.putIfAbsent(year, () => {for (int m = 1; m <= 12; m++) m: 0});
+      expenseMap.putIfAbsent(year, () => {for (int m = 1; m <= 12; m++) m: 0});
+      if (t.category?.type == CategoryType.expense) {
+        expenseMap[year]![month] =
+            (expenseMap[year]![month] ?? 0) + t.amount.abs();
+      } else {
+        incomeMap[year]![month] = (incomeMap[year]![month] ?? 0) + t.amount;
+      }
+    }
+
+    // Lấy 7 tháng gần nhất bất kể năm
+    final now = DateTime.now();
+    List<DateTime> last7Months = List.generate(7, (i) {
+      final dt = DateTime(now.year, now.month - (6 - i));
+      return DateTime(dt.year, dt.month);
+    });
+
+    final List<String> allMonthLabels = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
+    ];
+
+    final List<MonthlyReportItem> monthlyData = [];
+    for (final dt in last7Months) {
+      final year = dt.year;
+      final month = dt.month;
+      final label = '${allMonthLabels[month - 1]} $year';
+      final income = incomeMap[year]?[month] ?? 0;
+      final expense = expenseMap[year]?[month] ?? 0;
+      monthlyData.add(
+        MonthlyReportItem(monthLabel: label, income: income, expense: expense),
+      );
+    }
+    return monthlyData;
   }
 
   // Tổng hợp lại balance, tổng thu, tổng chi
@@ -119,7 +170,7 @@ class ReportCubit extends Cubit<ReportState> {
   ) {
     double income = 0, expense = 0;
     for (final t in transactions) {
-      if (t.amount < 0) {
+      if (t.category!.type.name == 'expense') {
         expense += t.amount.abs();
       } else {
         income += t.amount;

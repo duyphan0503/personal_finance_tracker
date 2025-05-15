@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:personal_finance_tracker/features/report/cubit/report_cubit.dart';
+import 'package:personal_finance_tracker/features/report/view/monthly_report_screen.dart';
 import 'package:personal_finance_tracker/features/report/view/report_summary_screen.dart';
 import 'package:personal_finance_tracker/shared/utils/format_utils.dart';
 
@@ -130,7 +131,7 @@ class _ReportScreenState extends State<ReportScreen>
                     children: [
                       SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),
-                        child: const CategoryReportScreen(),
+                        child: const MonthlyReportScreen(),
                       ),
                       SingleChildScrollView(
                         physics: const BouncingScrollPhysics(),

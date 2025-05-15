@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:personal_finance_tracker/features/category/model/category_model.dart';
 
-import '../../../features/category/data/datasources/category_remote_datasource.dart';
+import '../../features/category/data/datasources/category_remote_datasource.dart';
 
 class CategoryDropdown extends StatelessWidget {
   final List<CategoryModel> categories;
@@ -31,21 +31,22 @@ class CategoryDropdown extends StatelessWidget {
         value: selectedCategory,
         onChanged: onChanged,
         hint: const Text('Select Category'),
-        items: categories.map((category) {
-          return DropdownMenuItem<CategoryModel>(
-            value: category,
-            child: Row(
-              children: [
-                Icon(
-                  dataSource.getCategoryIcon(category.name),
-                  color: dataSource.getCategoryIconTheme(category.name),
+        items:
+            categories.map((category) {
+              return DropdownMenuItem<CategoryModel>(
+                value: category,
+                child: Row(
+                  children: [
+                    Icon(
+                      dataSource.getCategoryIcon(category.name),
+                      color: dataSource.getCategoryIconTheme(category.name),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(category.name),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Text(category.name),
-              ],
-            ),
-          );
-        }).toList(),
+              );
+            }).toList(),
       ),
     );
   }

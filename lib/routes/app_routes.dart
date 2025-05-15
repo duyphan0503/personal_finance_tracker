@@ -5,12 +5,13 @@ import 'package:personal_finance_tracker/features/auth/view/sign_in_screen.dart'
 import 'package:personal_finance_tracker/features/auth/view/sign_up_screen.dart';
 import 'package:personal_finance_tracker/features/budget/view/budget_screen.dart';
 import 'package:personal_finance_tracker/features/category/view/select_category_screen.dart';
-import 'package:personal_finance_tracker/features/report/view/category_report_screen.dart';
+import 'package:personal_finance_tracker/features/report/view/report_screen.dart';
 import 'package:personal_finance_tracker/features/report/view/report_summary_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/add_transaction_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/transaction_history_screen.dart';
 
 import '../features/dashboard/view/dashboard_screen.dart';
+import '../features/settings/view/account_security_screen.dart';
 
 class AppRoutes {
   // Route name constants
@@ -78,7 +79,7 @@ class AppRouter {
           ),
           GoRoute(
             path: AppRoutes.report,
-            builder: (context, state) => const CategoryReportScreen(),
+            builder: (context, state) => const ReportScreen(),
           ),
           GoRoute(
             path: AppRoutes.notifications,
@@ -86,7 +87,7 @@ class AppRouter {
           ),
           GoRoute(
             path: AppRoutes.settings,
-            builder: (context, state) => const Placeholder(),
+            builder: (context, state) => const AccountSecurityScreen(),
           ),
         ],
       ),

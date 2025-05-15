@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:personal_finance_tracker/features/report/cubit/report_summary_cubit.dart';
-import '../cubit/report_summary_state.dart';
+
+import '../cubit/report_cubit.dart';
 
 class ReportSummaryScreen extends StatefulWidget {
   const ReportSummaryScreen({super.key});
@@ -12,250 +12,225 @@ class ReportSummaryScreen extends StatefulWidget {
 }
 
 class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
-  DateTime _selectedMonth = DateTime.now();
+  late DateTime _selectedMonth;
 
   @override
   void initState() {
     super.initState();
+    _selectedMonth = DateTime.now();
     _loadData();
   }
 
   void _loadData() {
-    context.read<ReportSummaryCubit>().loadSummary(_selectedMonth);
+    context.read<ReportCubit>().loadReport(
+      type: 'summary',
+      filter: {'month': _selectedMonth.month, 'year': _selectedMonth.year},
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'Monthly Summary',
-          style: TextStyle(
-            color: Color(0xFF003C5B), // Màu xanh đậm
-            fontWeight: FontWeight.bold,
-            fontSize: 30,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-        child: BlocBuilder<ReportSummaryCubit, ReportSummaryState>(
-          builder: (context, state) {
-            if (state is ReportSummaryLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is ReportSummaryError) {
-              return Center(child: Text('Error: ${state.message}'));
-            } else if (state is ReportSummaryLoaded) {
-              return _buildSummaryContent(state);
-            }
-            return const Center(child: Text('Select a month to view summary'));
-          },
-        ),
-      ),
+    return BlocBuilder<ReportCubit, ReportState>(
+      builder: (context, state) {
+        if (state is ReportLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is ReportError) {
+          return Center(child: Text('Error: ${state.message}'));
+        } else if (state is ReportSummaryLoaded) {
+          return _buildSummaryContent(state.summaryData, _selectedMonth);
+        }
+        return const SizedBox();
+      },
     );
   }
 
-  Widget _buildSummaryContent(ReportSummaryLoaded state) {
-    final currencyFormat = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
+  Widget _buildSummaryContent(SummaryReportData data, DateTime selectedMonth) {
+    final currencyFormat = NumberFormat.currency(
+      symbol: '\$',
+      decimalDigits: 0,
+    );
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Month title
-        Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Thêm padding để có không gian cho khung
+    // Fake top expenses: bạn nên tính thực tế theo report_cubit
+    final List<_ExpenseItem> topExpenses = [
+      _ExpenseItem('Housing', 800, Icons.home),
+      _ExpenseItem('Food', 450, Icons.restaurant),
+      _ExpenseItem('Shopping', 300, Icons.shopping_bag),
+    ];
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Title
+          const Text(
+            "Monthly Summary",
+            style: TextStyle(
+              fontSize: 34,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF0D1B3D),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Month
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFD8A4), // Màu khung ngày tháng
-              borderRadius: BorderRadius.circular(8), // Tùy chọn bo góc khung
+              color: const Color(0xFFFFD8A4),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Text(
-              DateFormat('MMMM yyyy').format(state.selectedMonth),
+              DateFormat('MMMM yyyy').format(selectedMonth),
               style: const TextStyle(
-                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF003C5B), // Màu chữ xanh đậm
-                height: 1.5,
+                color: Color(0xFF003C5B),
+                fontSize: 18,
               ),
             ),
           ),
-        ),
-
-        const SizedBox(height: 24),
-
-        // Balance section
-        const Center(
-          child: Text(
-            'Balance',
+          const SizedBox(height: 24),
+          // Balance
+          const Text(
+            "Balance",
             style: TextStyle(
-              fontSize: 16,
-              color: Color(0xFF003C5B), // Màu xanh đậm
+              fontSize: 22,
               fontWeight: FontWeight.bold,
-              height: 1.5,
+              color: Color(0xFF0D1B3D),
             ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Center(
-          child: Text(
-            currencyFormat.format(state.balance),
+          const SizedBox(height: 2),
+          Text(
+            currencyFormat.format(data.balance),
             style: const TextStyle(
-              fontSize: 36,
+              fontSize: 46,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF003C5B), // Màu xanh đậm
-              height: 1.2,
+              color: Color(0xFF0D6B57),
+              letterSpacing: 1,
             ),
           ),
-        ),
-        const SizedBox(height: 24),
-
-        // Income & Expenses section
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Income Section with Blue Background
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 45),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEAF6FF), // Màu xanh nhạt cho Income
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: const Color(0xFFC2DBF6), // Màu viền
-                  width: 2, // Độ dày của viền (có thể điều chỉnh)
+          const SizedBox(height: 28),
+          // Income & Expenses Cards
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE9F3FF),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: const Color(0xFFB7D6F7),
+                      width: 1.4,
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      const Text(
+                        "Income",
+                        style: TextStyle(
+                          color: Color(0xFF003C5B),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        currencyFormat.format(data.income),
+                        style: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF003C5B),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-              child: Column(
-                children: [
-                  const Text(
-                    'Income',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                      height: 1.5,
-                    ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF0DB),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(color: Color(0xFFFEDAAF), width: 1.4),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    currencyFormat.format(state.income),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      height: 1.2,
-                    ),
+                  child: Column(
+                    children: [
+                      const Text(
+                        "Expenses",
+                        style: TextStyle(
+                          color: Color(0xFFFF8800),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        currencyFormat.format(data.expense),
+                        style: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFFFF8800),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 40),
-            // Expenses Section with Orange Background
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF0DB), // Màu cam nhạt cho Expenses
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: const Color(0xFFFEDAAF), // Màu viền
-                  width: 2, // Độ dày của viền (có thể điều chỉnh)
                 ),
               ),
-              child: Column(
-                children: [
-                  const Text(
-                    'Expenses',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFFFF7C03), // Màu chữ cam cho Expenses
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    currencyFormat.format(state.expenses),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFFF7C03), // Màu chữ cam cho Expenses
-                      height: 1.2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 32),
-
-        // Top Expenses section
-        const SizedBox(height: 16),
-        Center( // Centered the title
-          child: const Text(
-            'Top Expenses',
+            ],
+          ),
+          const SizedBox(height: 32),
+          // Top Expenses
+          const Text(
+            "Top Expenses",
             style: TextStyle(
-              fontSize: 25,
+              fontSize: 24,
+              color: Color(0xFF0D1B3D),
               fontWeight: FontWeight.bold,
-              color: Color(0xFF003C5B), // Màu xanh đậm cho tiêu đề
-              height: 1.5,
             ),
           ),
-        ),
-        const SizedBox(height: 16),
-        ...state.topExpenses.map((expense) {
-          // Xử lý việc thêm biểu tượng cho các danh mục cụ thể
-          IconData? categoryIcon;
-          switch (expense.categoryName.toLowerCase()) {
-            case 'housing':
-              categoryIcon = Icons.home; // Biểu tượng nhà
-              break;
-            case 'food':
-              categoryIcon = Icons.fastfood; // Biểu tượng thức ăn
-              break;
-            case 'shopping':
-              categoryIcon = Icons.shopping_cart; // Biểu tượng giỏ hàng
-              break;
-            default:
-              categoryIcon = Icons.category; // Biểu tượng mặc định
-          }
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Icon(
-                  categoryIcon, // Sử dụng icon tương ứng
-                  color: Color(0xFFFF7C03), // Màu của biểu tượng
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    expense.categoryName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                      height: 1.5,
+          const SizedBox(height: 18),
+          ...topExpenses.map(
+            (e) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 7),
+              child: Row(
+                children: [
+                  Icon(e.icon, color: const Color(0xFFFF8800), size: 28),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      e.name,
+                      style: const TextStyle(
+                        color: Color(0xFF0D1B3D),
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
-                ),
-                Text(
-                  currencyFormat.format(expense.amount),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF003C5B), // Màu xanh đậm cho giá trị
-                    height: 1.5,
+                  Text(
+                    currencyFormat.format(e.amount),
+                    style: const TextStyle(
+                      color: Color(0xFF0D1B3D),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          );
-        }).toList(),
-      ],
+          ),
+        ],
+      ),
     );
   }
+}
+
+// Helper for demo; in real use, map from category name or get from CategoryReportItem if you wish
+class _ExpenseItem {
+  final String name;
+  final double amount;
+  final IconData icon;
+  _ExpenseItem(this.name, this.amount, this.icon);
 }

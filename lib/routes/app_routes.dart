@@ -3,10 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/config/theme/app_colors.dart';
 import 'package:personal_finance_tracker/features/auth/view/sign_in_screen.dart';
 import 'package:personal_finance_tracker/features/auth/view/sign_up_screen.dart';
-import 'package:personal_finance_tracker/features/budget/view/budget_screen.dart';
 import 'package:personal_finance_tracker/features/category/view/select_category_screen.dart';
 import 'package:personal_finance_tracker/features/report/view/report_screen.dart';
 import 'package:personal_finance_tracker/features/report/view/report_summary_screen.dart';
+import 'package:personal_finance_tracker/features/settings/view/notification_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/add_transaction_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/transaction_history_screen.dart';
 
@@ -83,7 +83,7 @@ class AppRouter {
           ),
           GoRoute(
             path: AppRoutes.notifications,
-            builder: (context, state) => const BudgetScreen(),
+            builder: (context, state) => const NotificationScreen(),
           ),
           GoRoute(
             path: AppRoutes.settings,
@@ -131,7 +131,7 @@ class ScaffoldWithBottomNav extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.1),
+                        color: Colors.grey.shade100,
                         blurRadius: 4,
                         offset: const Offset(0, -2),
                       ),

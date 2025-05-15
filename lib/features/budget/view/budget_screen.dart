@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart';
 import 'package:personal_finance_tracker/injection.dart';
 import 'package:personal_finance_tracker/shared/services/notification_service.dart';
-import 'package:personal_finance_tracker/shared/widgets/category_dropdown.dart';
 
+import '../../../shared/widgets/category_dropdown.dart';
 import '../../category/data/datasources/category_remote_datasource.dart';
 import '../../category/model/category_model.dart';
 import '../cubit/budget_cubit.dart';
@@ -118,6 +118,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
     }
   }
 
+  // In the _saveBudget method, replace the existing implementation with:
   void _saveBudget() {
     if (_selectedCategory == null) {
       NotificationService.showError('Please select a category');
@@ -137,6 +138,10 @@ class _BudgetScreenState extends State<BudgetScreen> {
         .saveBudget(amount, _selectedCategory!.id)
         .then((_) {
           NotificationService.showSuccess('Budget saved successfully!');
+          Navigator.pop(
+            context,
+            false,
+          ); // Pass 'false' to reset the Budget Limit
         })
         .catchError((e) {
           NotificationService.showError('Failed to save budget: $e');

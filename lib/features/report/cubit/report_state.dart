@@ -31,11 +31,15 @@ class ReportMonthlyLoaded extends ReportState {
 
 class ReportSummaryLoaded extends ReportState {
   final SummaryReportData summaryData;
+  final List<CategoryReportItem> categoryData; // Added this line
 
-  const ReportSummaryLoaded({required this.summaryData});
+  const ReportSummaryLoaded({
+    required this.summaryData,
+    required this.categoryData, // Added this line
+  });
 
   @override
-  List<Object?> get props => [summaryData];
+  List<Object?> get props => [summaryData, categoryData]; // Updated this line
 }
 
 class ReportError extends ReportState {

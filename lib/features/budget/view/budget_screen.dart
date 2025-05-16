@@ -118,7 +118,8 @@ class _BudgetScreenState extends State<BudgetScreen> {
     }
   }
 
-  // In the _saveBudget method, replace the existing implementation with:
+  // BudgetScreen.dart (chỉ cần đảm bảo ở _saveBudget gọi Navigator.pop trả true khi lưu thành công)
+
   void _saveBudget() {
     if (_selectedCategory == null) {
       NotificationService.showError('Please select a category');
@@ -137,22 +138,21 @@ class _BudgetScreenState extends State<BudgetScreen> {
         .read<BudgetCubit>()
         .saveBudget(amount, _selectedCategory!.id)
         .then((_) {
-          NotificationService.showSuccess('Budget saved successfully!');
-          Navigator.pop(
-            context,
-            false,
-          ); // Pass 'false' to reset the Budget Limit
-        })
+      NotificationService.showSuccess('Budget saved successfully!');
+      Navigator.pop(context, true); // Trả về true cho NotificationScreen
+    })
         .catchError((e) {
-          NotificationService.showError('Failed to save budget: $e');
-        });
+      NotificationService.showError('Failed to save budget: $e');
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text(
           'Set Budget',
           style: TextStyle(
@@ -164,7 +164,6 @@ class _BudgetScreenState extends State<BudgetScreen> {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: BlocConsumer<BudgetCubit, BudgetState>(
         listener: (context, state) {

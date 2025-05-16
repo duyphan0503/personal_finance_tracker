@@ -119,10 +119,11 @@ class _SelectCategoryScreenState extends State<SelectCategoryScreen> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(10),
+          color: isSelected ? iconColor.withAlpha(50) : Colors.white,
           border: isSelected
               ? Border.all(color: iconColor, width: 2)
-              : null,
+              : Border.all(color: Colors.blue.shade50, width: 1),
         ),
         child: ListTile(
           leading: Icon(iconData, color: iconColor),

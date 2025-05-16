@@ -39,16 +39,8 @@ import 'package:personal_finance_tracker/features/report/cubit/report_cubit.dart
     as _i741;
 import 'package:personal_finance_tracker/features/report/data/datasources/report_remote_datasource.dart'
     as _i330;
-import 'package:personal_finance_tracker/features/report/data/datasources/report_summary_remote_datasource.dart'
-    as _i826;
 import 'package:personal_finance_tracker/features/report/data/repository/report_repository.dart'
     as _i1070;
-import 'package:personal_finance_tracker/features/report/summary/cubit/report_summary_cubit.dart'
-    as _i39;
-import 'package:personal_finance_tracker/features/report/summary/data/datasources/report_summary_remote_datasource.dart'
-    as _i993;
-import 'package:personal_finance_tracker/features/report/summary/data/repository/report_summary_repository.dart'
-    as _i621;
 import 'package:personal_finance_tracker/features/transaction/cubit/transaction_cubit.dart'
     as _i716;
 import 'package:personal_finance_tracker/features/transaction/data/datasources/transaction_remote_datasource.dart'
@@ -93,14 +85,8 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i330.ReportRemoteDataSource>(
       () => _i330.ReportRemoteDataSource(gh<_i454.SupabaseClient>()),
     );
-    gh.lazySingleton<_i826.ReportSummaryRemoteDataSource>(
-      () => _i826.ReportSummaryRemoteDataSource(gh<_i454.SupabaseClient>()),
-    );
     gh.lazySingleton<_i114.TransactionRemoteDataSource>(
       () => _i114.TransactionRemoteDataSource(gh<_i454.SupabaseClient>()),
-    );
-    gh.lazySingleton<_i993.ReportSummaryRemoteDataSource>(
-      () => _i993.ReportSummaryRemoteDataSource(gh<_i454.SupabaseClient>()),
     );
     gh.lazySingleton<_i125.CategoryRepository>(
       () => _i125.CategoryRepository(gh<_i589.CategoryRemoteDataSource>()),
@@ -108,11 +94,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1067.TransactionRepository>(
       () =>
           _i1067.TransactionRepository(gh<_i114.TransactionRemoteDataSource>()),
-    );
-    gh.lazySingleton<_i621.ReportSummaryRepository>(
-      () => _i621.ReportSummaryRepository(
-        gh<_i993.ReportSummaryRemoteDataSource>(),
-      ),
     );
     gh.lazySingleton<_i417.BudgetRemoteDataSource>(
       () => _i417.BudgetRemoteDataSource(
@@ -148,9 +129,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i688.CategoryCubit>(
       () => _i688.CategoryCubit(gh<_i125.CategoryRepository>()),
-    );
-    gh.factory<_i39.ReportSummaryCubit>(
-      () => _i39.ReportSummaryCubit(gh<_i621.ReportSummaryRepository>()),
     );
     gh.factory<_i741.ReportCubit>(
       () => _i741.ReportCubit(gh<_i1070.ReportRepository>()),

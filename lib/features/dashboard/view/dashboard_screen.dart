@@ -79,17 +79,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     children: [
                       SummaryCard(
                         title: 'INCOME',
-                        value: FormatUtils.formatCurrency(totalIncome),
+                        value: FormatUtils.formatCurrency(totalIncome, showDecimals: false),
                         color: AppColors.incomeColor,
                       ),
+                      const SizedBox(width: 10),
                       SummaryCard(
                         title: 'EXPENSES',
-                        value: FormatUtils.formatCurrency(totalExpenses),
+                        value: FormatUtils.formatCurrency(totalExpenses, showDecimals: false),
                         color: AppColors.expenseColor,
                       ),
+                      const SizedBox(width: 10),
                       SummaryCard(
                         title: 'BALANCE',
-                        value: FormatUtils.formatCurrency(_getBalance()),
+                        value: FormatUtils.formatCurrency(_getBalance(), showDecimals: false),
                         color: AppColors.balanceColor,
                       ),
                     ],
@@ -195,15 +197,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               size: 40,
                             ),
                           ),
-                          if (index != state.recentTransactions.length - 1)
-                            const Padding(
-                              padding: EdgeInsets.only(left: 58),
-                              child: Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: Color(0xFFE0E3E7),
-                              ),
-                            ),
                         ],
                       ),
                     ),

@@ -35,10 +35,6 @@ import 'package:personal_finance_tracker/features/category/model/category_model.
     as _i800;
 import 'package:personal_finance_tracker/features/dashboard/cubit/dashboard_cubit.dart'
     as _i988;
-import 'package:personal_finance_tracker/features/report/cubit/report_cubit.dart'
-    as _i741;
-import 'package:personal_finance_tracker/features/report/cubit/report_summary_cubit.dart'
-    as _i817;
 import 'package:personal_finance_tracker/features/report/data/datasources/report_remote_datasource.dart'
     as _i330;
 import 'package:personal_finance_tracker/features/report/data/datasources/report_summary_remote_datasource.dart'
@@ -115,9 +111,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i589.CategoryRemoteDataSource>(),
       ),
     );
-    gh.factory<_i817.ReportSummaryCubit>(
-      () => _i817.ReportSummaryCubit(gh<_i1044.ReportSummaryRepository>()),
-    );
     gh.factory<_i988.DashboardCubit>(
       () => _i988.DashboardCubit(gh<_i1067.TransactionRepository>()),
     );
@@ -146,9 +139,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i688.CategoryCubit>(
       () => _i688.CategoryCubit(gh<_i125.CategoryRepository>()),
-    );
-    gh.factory<_i741.ReportCubit>(
-      () => _i741.ReportCubit(gh<_i1070.ReportRepository>()),
     );
     gh.lazySingleton<_i441.AuthRepository>(
       () => _i441.AuthRepository(dataSource: gh<_i387.AuthRemoteDataSource>()),

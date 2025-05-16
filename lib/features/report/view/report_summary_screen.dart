@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart';
+import 'package:personal_finance_tracker/injection.dart';
 
+import '../../../config/theme/app_colors.dart';
 import '../cubit/report_cubit.dart';
 
 class ReportSummaryScreen extends StatefulWidget {
@@ -12,6 +15,7 @@ class ReportSummaryScreen extends StatefulWidget {
 }
 
 class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
+  late final CategoryCubit _categoryCubit;
   late DateTime _selectedMonth;
   final NumberFormat _currencyFormat = NumberFormat.currency(
     symbol: '\$',
@@ -23,6 +27,7 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
     super.initState();
     _selectedMonth = DateTime.now();
     _loadData();
+    _categoryCubit = getIt<CategoryCubit>();
   }
 
   void _loadData() {
@@ -80,33 +85,11 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
       return sortedEntries.take(3).map((entry) => _ExpenseItem(
         entry.key,
         entry.value,
-        _getIconForCategory(entry.key),
+        _categoryCubit.getCategoryIcon(entry.key),
       )).toList();
     } catch (e) {
       return [];
     }
-  }
-
-  IconData _getIconForCategory(String categoryName) {
-    final lowerName = categoryName.toLowerCase();
-    if (lowerName.contains('food') || lowerName.contains('restaurant')) {
-      return Icons.restaurant;
-    } else if (lowerName.contains('shop')) {
-      return Icons.shopping_bag;
-    } else if (lowerName.contains('transport')) {
-      return Icons.directions_car;
-    } else if (lowerName.contains('house') || lowerName.contains('rent')) {
-      return Icons.home;
-    } else if (lowerName.contains('entertain') || lowerName.contains('movie')) {
-      return Icons.movie;
-    } else if (lowerName.contains('util')) {
-      return Icons.bolt;
-    } else if (lowerName.contains('health') || lowerName.contains('medical')) {
-      return Icons.medical_services;
-    } else if (lowerName.contains('educat')) {
-      return Icons.school;
-    }
-    return Icons.money_off;
   }
 
   Widget _buildSummaryContent(
@@ -280,13 +263,13 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
       padding: const EdgeInsets.symmetric(vertical: 7),
       child: Row(
         children: [
-          Icon(item.icon, color: const Color(0xFFFF8800), size: 28),
+          Icon(item.icon, color: _categoryCubit.getCategoryIconColor(item.name), size: 28),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               item.name,
-              style: const TextStyle(
-                color: Color(0xFF0D1B3D),
+              style: TextStyle(
+                color: AppColors.primaryVariant,
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
               ),
@@ -294,8 +277,8 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
           ),
           Text(
             _currencyFormat.format(item.amount),
-            style: const TextStyle(
-              color: Color(0xFF0D1B3D),
+            style: TextStyle(
+              color: AppColors.primaryVariant,
               fontWeight: FontWeight.bold,
               fontSize: 20,
             ),

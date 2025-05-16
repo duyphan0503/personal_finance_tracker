@@ -11,15 +11,49 @@ part 'transaction_state.dart';
 class TransactionCubit extends Cubit<TransactionState> {
   final TransactionRepository _repository;
 
+  int _currentOffset = 0;
+  bool _hasMore = true;
+  bool _isLoadingMore = false;
+  final List<TransactionModel> _transactions = [];
+
   TransactionCubit(this._repository) : super(TransactionInitial());
 
-  Future<void> fetchAllTransactions() async {
-    emit(TransactionLoading());
+  Future<void> fetchInitialTransactionsWithLimit(int limit) async {
     try {
-      final transactions = await _repository.fetchTransactions();
-      emit(TransactionLoaded(transactions));
+      emit(TransactionLoading());
+      _currentOffset = 0;
+      _hasMore = true;
+      _transactions.clear();
+
+      final newTxs = await _repository.fetchTransactions(limit: limit, offset: _currentOffset);
+      _transactions.addAll(newTxs);
+
+      _currentOffset += newTxs.length;
+      _hasMore = newTxs.length == limit;
+
+      emit(TransactionLoaded(List.unmodifiable(_transactions), hasMore: _hasMore));
     } catch (e) {
       emit(TransactionError(e.toString()));
+    }
+  }
+
+  Future<void> fetchMoreTransactions(int limit) async {
+    if (!_hasMore || _isLoadingMore) return;
+
+    try {
+      _isLoadingMore = true;
+
+      final newTxs = await _repository.fetchTransactions(limit: limit, offset: _currentOffset);
+      _transactions.addAll(newTxs);
+
+      _currentOffset += newTxs.length;
+      _hasMore = newTxs.length == limit;
+
+      emit(TransactionLoaded(List.unmodifiable(_transactions), hasMore: _hasMore));
+    } catch (e) {
+      emit(TransactionError(e.toString()));
+    } finally {
+      _isLoadingMore = false;
     }
   }
 
@@ -37,14 +71,8 @@ class TransactionCubit extends Cubit<TransactionState> {
         note: note,
         date: date,
       );
-      final currentState = state;
-      if (currentState is TransactionLoaded) {
-        final updatedList = List<TransactionModel>.from(currentState.transactions)
-          ..add(newTransaction);
-        _sortAndEmit(updatedList);
-      } else {
-        await fetchAllTransactions();
-      }
+      _transactions.insert(0, newTransaction);
+      emit(TransactionLoaded(List.unmodifiable(_transactions), hasMore: _hasMore));
     } catch (e) {
       emit(TransactionError(e.toString()));
     }
@@ -66,19 +94,11 @@ class TransactionCubit extends Cubit<TransactionState> {
         note: note,
         date: date,
       );
-      final currentState = state;
-      if (currentState is TransactionLoaded) {
-        final index = currentState.transactions.indexWhere((t) => t.id == id);
-        if (index != -1) {
-          final updatedList = List<TransactionModel>.from(currentState.transactions);
-          updatedList[index] = updatedTransaction;
-          _sortAndEmit(updatedList);
-        } else {
-          await fetchAllTransactions();
-        }
-      } else {
-        await fetchAllTransactions();
+      final index = _transactions.indexWhere((t) => t.id == id);
+      if (index != -1) {
+        _transactions[index] = updatedTransaction;
       }
+      emit(TransactionLoaded(List.unmodifiable(_transactions), hasMore: _hasMore));
     } catch (e) {
       emit(TransactionError(e.toString()));
     }
@@ -88,22 +108,11 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(TransactionLoading());
     try {
       await _repository.deleteTransaction(id);
-      final currentState = state;
-      if (currentState is TransactionLoaded) {
-        final updatedList = currentState.transactions.where((t) => t.id != id).toList();
-        emit(TransactionDeleted());
-        emit(TransactionLoaded(updatedList));
-      } else {
-        emit(TransactionDeleted());
-        await fetchAllTransactions();
-      }
+      _transactions.removeWhere((t) => t.id == id);
+      emit(TransactionDeleted());
+      emit(TransactionLoaded(List.unmodifiable(_transactions), hasMore: _hasMore));
     } catch (e) {
       emit(TransactionError(e.toString()));
     }
-  }
-
-  void _sortAndEmit(List<TransactionModel> transactions) {
-    transactions.sort((a, b) => b.transactionDate.compareTo(a.transactionDate));
-    emit(TransactionLoaded(transactions));
   }
 }

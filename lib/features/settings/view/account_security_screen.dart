@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Để sử dụng SystemNavigator
+import 'package:flutter/services.dart';
+
+import '../../../injection.dart';
+import '../../auth/cubit/auth_cubit.dart'; // Để sử dụng SystemNavigator
 
 class AccountSecurityScreen extends StatefulWidget {
   const AccountSecurityScreen({super.key});
@@ -135,10 +138,10 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(context);
               // Đóng ứng dụng
-              SystemNavigator.pop(); // Đóng ứng dụng và quay lại màn hình chính
+              await getIt<AuthCubit>().signOut();
             },
             child: const Text(
               'Log Out',

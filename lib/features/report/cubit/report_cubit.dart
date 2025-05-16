@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 
 import '../../category/model/category_model.dart';
 import '../../transaction/model/transaction_model.dart';
@@ -7,6 +8,7 @@ import '../data/repository/report_repository.dart';
 
 part 'report_state.dart';
 
+@injectable
 class ReportCubit extends Cubit<ReportState> {
   final ReportRepository _repository;
 
@@ -18,10 +20,8 @@ class ReportCubit extends Cubit<ReportState> {
   }) async {
     emit(ReportLoading());
     try {
-      // Load dữ liệu transactions từ remote, có thể filter theo tháng/năm/category
       final transactions = await _repository.fetchTransactions(filter: filter);
 
-      // Tính toán dữ liệu cần thiết cho từng loại report
       switch (type) {
         case 'category':
           final categoryData = _calculateCategoryReport(transactions, filter);
@@ -33,7 +33,11 @@ class ReportCubit extends Cubit<ReportState> {
           break;
         case 'summary':
           final summaryData = _calculateSummaryReport(transactions, filter);
-          emit(ReportSummaryLoaded(summaryData: summaryData));
+          final categoryData = _calculateCategoryReport(transactions, filter);
+          emit(ReportSummaryLoaded(
+            summaryData: summaryData,
+            categoryData: categoryData,
+          ));
           break;
         default:
           emit(const ReportError('Unknown report type'));
@@ -45,9 +49,9 @@ class ReportCubit extends Cubit<ReportState> {
 
   // Group by category, sum amount
   List<CategoryReportItem> _calculateCategoryReport(
-    List<TransactionModel> transactions,
-    Map<String, dynamic> filter,
-  ) {
+      List<TransactionModel> transactions,
+      Map<String, dynamic> filter,
+      ) {
     final Map<String, double> expenseMap = {};
     final Map<String, double> incomeMap = {};
 
@@ -58,11 +62,15 @@ class ReportCubit extends Cubit<ReportState> {
       if (categoryType == CategoryType.expense) {
         expenseMap.update(
           cName,
-          (v) => v + t.amount.abs(),
+              (v) => v + t.amount.abs(),
           ifAbsent: () => t.amount.abs(),
         );
       } else {
-        incomeMap.update(cName, (v) => v + t.amount, ifAbsent: () => t.amount);
+        incomeMap.update(
+          cName,
+              (v) => v + t.amount,
+          ifAbsent: () => t.amount,
+        );
       }
     }
 
@@ -73,33 +81,22 @@ class ReportCubit extends Cubit<ReportState> {
       CategoryReportItem(
         title: 'Expense',
         total: totalExpense,
-        items:
-            expenseMap.entries
-                .map(
-                  (e) => CategoryReportPieItem(
-                    name: e.key,
-                    value: e.value,
-                    percent:
-                        totalExpense == 0 ? 0 : e.value / totalExpense * 100,
-                    type: 'expense',
-                  ),
-                )
-                .toList(),
+        items: expenseMap.entries.map((e) => CategoryReportPieItem(
+          name: e.key,
+          value: e.value,
+          percent: totalExpense == 0 ? 0 : e.value / totalExpense * 100,
+          type: 'expense',
+        )).toList(),
       ),
       CategoryReportItem(
         title: 'Income',
         total: totalIncome,
-        items:
-            incomeMap.entries
-                .map(
-                  (e) => CategoryReportPieItem(
-                    name: e.key,
-                    value: e.value,
-                    percent: totalIncome == 0 ? 0 : e.value / totalIncome * 100,
-                    type: 'income',
-                  ),
-                )
-                .toList(),
+        items: incomeMap.entries.map((e) => CategoryReportPieItem(
+          name: e.key,
+          value: e.value,
+          percent: totalIncome == 0 ? 0 : e.value / totalIncome * 100,
+          type: 'income',
+        )).toList(),
       ),
     ];
   }

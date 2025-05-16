@@ -31,14 +31,20 @@ class TransactionCubit extends Cubit<TransactionState> {
   }) async {
     emit(TransactionLoading());
     try {
-      await _repository.createTransaction(
+      final newTransaction = await _repository.createTransaction(
         categoryId: categoryId,
         amount: amount,
         note: note,
         date: date,
       );
-      final list = await _repository.fetchTransactions();
-      emit(TransactionLoaded(list));
+      final currentState = state;
+      if (currentState is TransactionLoaded) {
+        final updatedList = List<TransactionModel>.from(currentState.transactions)
+          ..add(newTransaction);
+        _sortAndEmit(updatedList);
+      } else {
+        await fetchAllTransactions();
+      }
     } catch (e) {
       emit(TransactionError(e.toString()));
     }
@@ -53,15 +59,26 @@ class TransactionCubit extends Cubit<TransactionState> {
   }) async {
     emit(TransactionLoading());
     try {
-      await _repository.updateTransaction(
+      final updatedTransaction = await _repository.updateTransaction(
         id: id,
         categoryId: categoryId,
         amount: amount,
         note: note,
         date: date,
       );
-      final list = await _repository.fetchTransactions();
-      emit(TransactionLoaded(list));
+      final currentState = state;
+      if (currentState is TransactionLoaded) {
+        final index = currentState.transactions.indexWhere((t) => t.id == id);
+        if (index != -1) {
+          final updatedList = List<TransactionModel>.from(currentState.transactions);
+          updatedList[index] = updatedTransaction;
+          _sortAndEmit(updatedList);
+        } else {
+          await fetchAllTransactions();
+        }
+      } else {
+        await fetchAllTransactions();
+      }
     } catch (e) {
       emit(TransactionError(e.toString()));
     }
@@ -71,10 +88,22 @@ class TransactionCubit extends Cubit<TransactionState> {
     emit(TransactionLoading());
     try {
       await _repository.deleteTransaction(id);
-      final list = await _repository.fetchTransactions();
-      emit(TransactionLoaded(list));
+      final currentState = state;
+      if (currentState is TransactionLoaded) {
+        final updatedList = currentState.transactions.where((t) => t.id != id).toList();
+        emit(TransactionDeleted());
+        emit(TransactionLoaded(updatedList));
+      } else {
+        emit(TransactionDeleted());
+        await fetchAllTransactions();
+      }
     } catch (e) {
       emit(TransactionError(e.toString()));
     }
+  }
+
+  void _sortAndEmit(List<TransactionModel> transactions) {
+    transactions.sort((a, b) => b.transactionDate.compareTo(a.transactionDate));
+    emit(TransactionLoaded(transactions));
   }
 }

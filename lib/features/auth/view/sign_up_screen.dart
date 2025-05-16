@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/routes/app_routes.dart';
 import 'package:personal_finance_tracker/shared/services/notification_service.dart';
+import 'package:personal_finance_tracker/shared/widgets/input_text_field.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../shared/utils/validators.dart';
-import '../../../shared/widgets/auth_text_field.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
@@ -24,18 +24,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
     _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
-  }
-
-  void _togglePassword() {
-    setState(() => _obscurePassword = !_obscurePassword);
   }
 
   void _signUp() {
@@ -54,12 +53,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
       backgroundColor: AppColors.background,
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
-          if (state.status == AuthStatus.authenticated) {
+          if (state.status == AuthStatus.error) {
+            if (state.errorMessage?.contains('already') == true) {
+              NotificationService.showError('Email already in use');
+            } else {
+              NotificationService.showError(
+                state.errorMessage ?? 'An error occurred',
+              );
+            }
+          } else if (state.status == AuthStatus.authenticated) {
             context.go(AppRoutes.dashboard);
-          } else if (state.status == AuthStatus.error) {
-            NotificationService.showError(
-              state.errorMessage ?? 'An error occurred during signup',
-            );
+            NotificationService.showSuccess('Account created successfully!');
           }
         },
         builder: (context, state) {
@@ -92,7 +96,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       const SizedBox(height: 28),
-                      AuthTextField(
+                      InputTextField(
                         controller: _fullNameController,
                         hintText: "Full Name",
                         textInputAction: TextInputAction.next,
@@ -103,7 +107,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             ),
                       ),
                       const SizedBox(height: 16),
-                      AuthTextField(
+                      InputTextField(
                         controller: _emailController,
                         hintText: "Email",
                         keyboardType: TextInputType.emailAddress,
@@ -111,7 +115,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         validator: Validators.email,
                       ),
                       const SizedBox(height: 16),
-                      AuthTextField(
+                      InputTextField(
                         controller: _passwordController,
                         hintText: "Password",
                         obscureText: _obscurePassword,
@@ -122,10 +126,38 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 : Icons.visibility,
                             color: Colors.grey[400],
                           ),
-                          onPressed: _togglePassword,
+                          onPressed:
+                              () => setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              }),
+                        ),
+                        textInputAction: TextInputAction.next,
+                        validator: Validators.password,
+                      ),
+                      const SizedBox(height: 16),
+                      InputTextField(
+                        controller: _confirmPasswordController,
+                        hintText: "Confirm Password",
+                        obscureText: _obscureConfirmPassword,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey[400],
+                          ),
+                          onPressed:
+                              () => setState(() {
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword;
+                              }),
                         ),
                         textInputAction: TextInputAction.done,
-                        validator: Validators.password,
+                        validator:
+                            (value) => Validators.confirmPassword(
+                              value,
+                              _passwordController.text,
+                            ),
                       ),
                       const SizedBox(height: 30),
                       SizedBox(
@@ -157,8 +189,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                       ),
                       const SizedBox(height: 22),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
                             "Already have an account?",

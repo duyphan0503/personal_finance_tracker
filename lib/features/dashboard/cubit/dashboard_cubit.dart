@@ -32,15 +32,15 @@ class DashboardCubit extends Cubit<DashboardState> {
         }
       }
 
-      final recentTransactions =
-          [...transactions]
-            ..sort((a, b) => b.transactionDate.compareTo(a.transactionDate))
-            ..take(5).toList();
+      final recentTransactions = [...transactions]
+        ..sort((a, b) => b.transactionDate.compareTo(a.transactionDate));
+
+      final limitedTransactions = recentTransactions.take(3).toList();
 
       emit(
         state.copyWith(
           status: DashboardStatus.loaded,
-          recentTransactions: recentTransactions,
+          recentTransactions: limitedTransactions,
           totalIncome: income,
           totalExpenses: expenses,
         ),

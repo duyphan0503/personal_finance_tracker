@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/routes/app_routes.dart';
+import 'package:personal_finance_tracker/shared/services/notification_service.dart';
+import 'package:personal_finance_tracker/shared/widgets/input_text_field.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../gen/assets.gen.dart';
 import '../../../shared/utils/validators.dart';
-import '../../../shared/widgets/auth_text_field.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
@@ -59,6 +60,7 @@ class _SignInScreenState extends State<SignInScreen> {
             );
           } else if (state.status == AuthStatus.authenticated) {
             context.go(AppRoutes.dashboard);
+            NotificationService.showSuccess('Logged in successfully!');
           }
         },
         builder: (context, state) {
@@ -92,7 +94,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       const SizedBox(height: 28),
                       // Email
-                      AuthTextField(
+                      InputTextField(
                         controller: _emailController,
                         hintText: "Email",
                         keyboardType: TextInputType.emailAddress,
@@ -101,7 +103,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       const SizedBox(height: 16),
                       // Password
-                      AuthTextField(
+                      InputTextField(
                         controller: _passwordController,
                         hintText: "Password",
                         obscureText: _obscurePassword,
@@ -156,8 +158,8 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
                             "Don't have an account?",

@@ -18,6 +18,8 @@ class TransactionLoaded extends TransactionState {
   List<Object?> get props => [transactions];
 }
 
+class TransactionDeleted extends TransactionState {}
+
 class TransactionError extends TransactionState {
   final String message;
 

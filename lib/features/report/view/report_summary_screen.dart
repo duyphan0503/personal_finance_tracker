@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
-import 'package:personal_finance_tracker/features/report/cubit/report_summary_cubit.dart';
-import '../cubit/report_summary_state.dart';
+import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart';
+import 'package:personal_finance_tracker/injection.dart';
+
+import '../../../config/theme/app_colors.dart';
+import '../cubit/report_cubit.dart';
 
 class ReportSummaryScreen extends StatefulWidget {
   const ReportSummaryScreen({super.key});
@@ -12,250 +15,284 @@ class ReportSummaryScreen extends StatefulWidget {
 }
 
 class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
-  DateTime _selectedMonth = DateTime.now();
+  late final CategoryCubit _categoryCubit;
+  late DateTime _selectedMonth;
+  final NumberFormat _currencyFormat = NumberFormat.currency(
+    symbol: '\$',
+    decimalDigits: 0,
+  );
 
   @override
   void initState() {
     super.initState();
+    _selectedMonth = DateTime.now();
     _loadData();
+    _categoryCubit = getIt<CategoryCubit>();
   }
 
   void _loadData() {
-    context.read<ReportSummaryCubit>().loadSummary(_selectedMonth);
+    context.read<ReportCubit>().loadReport(
+      type: 'summary',
+      filter: {'month': _selectedMonth.month, 'year': _selectedMonth.year},
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'Monthly Summary',
-          style: TextStyle(
-            color: Color(0xFF003C5B), // Màu xanh đậm
-            fontWeight: FontWeight.bold,
-            fontSize: 30,
-          ),
+    return BlocBuilder<ReportCubit, ReportState>(
+      builder: (context, state) {
+        if (state is ReportLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is ReportError) {
+          return Center(child: Text('Error: ${state.message}'));
+        } else if (state is ReportSummaryLoaded) {
+          return _buildSummaryContent(
+            state.summaryData,
+            _getTopExpenses(state.categoryData),
+          );
+        }
+        return const SizedBox();
+      },
+    );
+  }
+
+  List<_ExpenseItem> _getTopExpenses(List<CategoryReportItem> categoryData) {
+    try {
+      final expenseCategory = categoryData.firstWhere(
+            (item) => item.title == 'Expense',
+        orElse: () => const CategoryReportItem(
+          title: 'Expense',
+          total: 0,
+          items: [],
         ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-        child: BlocBuilder<ReportSummaryCubit, ReportSummaryState>(
-          builder: (context, state) {
-            if (state is ReportSummaryLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is ReportSummaryError) {
-              return Center(child: Text('Error: ${state.message}'));
-            } else if (state is ReportSummaryLoaded) {
-              return _buildSummaryContent(state);
-            }
-            return const Center(child: Text('Select a month to view summary'));
-          },
-        ),
+      );
+
+      // Group items by name and sum their values
+      final expenseMap = <String, double>{};
+      for (final item in expenseCategory.items) {
+        expenseMap.update(
+          item.name,
+              (value) => value + item.value,
+          ifAbsent: () => item.value,
+        );
+      }
+
+      // Convert to list and sort by value descending
+      final sortedEntries = expenseMap.entries.toList()
+        ..sort((a, b) => b.value.compareTo(a.value));
+
+      // Take top 3 and map to _ExpenseItem
+      return sortedEntries.take(3).map((entry) => _ExpenseItem(
+        entry.key,
+        entry.value,
+        _categoryCubit.getCategoryIcon(entry.key),
+      )).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Widget _buildSummaryContent(
+      SummaryReportData data,
+      List<_ExpenseItem> topExpenses,
+      ) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _buildHeader(),
+          const SizedBox(height: 24),
+          _buildBalanceSection(data),
+          const SizedBox(height: 28),
+          _buildIncomeExpenseCards(data),
+          const SizedBox(height: 32),
+          _buildTopExpensesSection(topExpenses),
+        ],
       ),
     );
   }
 
-  Widget _buildSummaryContent(ReportSummaryLoaded state) {
-    final currencyFormat = NumberFormat.currency(symbol: '\$', decimalDigits: 0);
-
+  Widget _buildHeader() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Month title
-        Center(
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0), // Thêm padding để có không gian cho khung
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFD8A4), // Màu khung ngày tháng
-              borderRadius: BorderRadius.circular(8), // Tùy chọn bo góc khung
-            ),
-            child: Text(
-              DateFormat('MMMM yyyy').format(state.selectedMonth),
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF003C5B), // Màu chữ xanh đậm
-                height: 1.5,
-              ),
-            ),
+        const Text(
+          "Monthly Summary",
+          style: TextStyle(
+            fontSize: 34,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF0D1B3D),
           ),
         ),
-
-        const SizedBox(height: 24),
-
-        // Balance section
-        const Center(
-          child: Text(
-            'Balance',
-            style: TextStyle(
-              fontSize: 16,
-              color: Color(0xFF003C5B), // Màu xanh đậm
-              fontWeight: FontWeight.bold,
-              height: 1.5,
-            ),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFD8A4),
+            borderRadius: BorderRadius.circular(14),
           ),
-        ),
-        const SizedBox(height: 4),
-        Center(
           child: Text(
-            currencyFormat.format(state.balance),
+            DateFormat('MMMM yyyy').format(_selectedMonth),
             style: const TextStyle(
-              fontSize: 36,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF003C5B), // Màu xanh đậm
-              height: 1.2,
+              color: Color(0xFF003C5B),
+              fontSize: 18,
             ),
           ),
         ),
-        const SizedBox(height: 24),
+      ],
+    );
+  }
 
-        // Income & Expenses section
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildBalanceSection(SummaryReportData data) {
+    return Column(
+      children: [
+        const Text(
+          "Balance",
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFF0D1B3D),
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          _currencyFormat.format(data.balance),
+          style: TextStyle(
+            fontSize: 46,
+            fontWeight: FontWeight.bold,
+            color: data.balance >= 0 ? const Color(0xFF0D6B57) : Colors.red,
+            letterSpacing: 1,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIncomeExpenseCards(SummaryReportData data) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _buildCard(
+          title: "Income",
+          amount: data.income,
+          color: const Color(0xFFE9F3FF),
+          borderColor: const Color(0xFFB7D6F7),
+          textColor: const Color(0xFF003C5B),
+        ),
+        const SizedBox(width: 16),
+        _buildCard(
+          title: "Expenses",
+          amount: data.expense,
+          color: const Color(0xFFFFF0DB),
+          borderColor: const Color(0xFFFEDAAF),
+          textColor: const Color(0xFFFF8800),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCard({
+    required String title,
+    required double amount,
+    required Color color,
+    required Color borderColor,
+    required Color textColor,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 18),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(15),
+          border: Border.all(color: borderColor, width: 1.4),
+        ),
+        child: Column(
           children: [
-            // Income Section with Blue Background
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 45),
-              decoration: BoxDecoration(
-                color: const Color(0xFFEAF6FF), // Màu xanh nhạt cho Income
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: const Color(0xFFC2DBF6), // Màu viền
-                  width: 2, // Độ dày của viền (có thể điều chỉnh)
-                ),
-              ),
-              child: Column(
-                children: [
-                  const Text(
-                    'Income',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    currencyFormat.format(state.income),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                      height: 1.2,
-                    ),
-                  ),
-                ],
+            Text(
+              title,
+              style: TextStyle(
+                color: textColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
               ),
             ),
-            const SizedBox(width: 40),
-            // Expenses Section with Orange Background
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 40),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFF0DB), // Màu cam nhạt cho Expenses
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: const Color(0xFFFEDAAF), // Màu viền
-                  width: 2, // Độ dày của viền (có thể điều chỉnh)
-                ),
-              ),
-              child: Column(
-                children: [
-                  const Text(
-                    'Expenses',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFFFF7C03), // Màu chữ cam cho Expenses
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    currencyFormat.format(state.expenses),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFFFF7C03), // Màu chữ cam cho Expenses
-                      height: 1.2,
-                    ),
-                  ),
-                ],
+            const SizedBox(height: 6),
+            Text(
+              _currencyFormat.format(amount),
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: textColor,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 32),
+      ),
+    );
+  }
 
-        // Top Expenses section
-        const SizedBox(height: 16),
-        Center( // Centered the title
-          child: const Text(
-            'Top Expenses',
-            style: TextStyle(
-              fontSize: 25,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF003C5B), // Màu xanh đậm cho tiêu đề
-              height: 1.5,
-            ),
+  Widget _buildTopExpensesSection(List<_ExpenseItem> topExpenses) {
+    return Column(
+      children: [
+        const Text(
+          "Top Expenses",
+          style: TextStyle(
+            fontSize: 24,
+            color: Color(0xFF0D1B3D),
+            fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 16),
-        ...state.topExpenses.map((expense) {
-          // Xử lý việc thêm biểu tượng cho các danh mục cụ thể
-          IconData? categoryIcon;
-          switch (expense.categoryName.toLowerCase()) {
-            case 'housing':
-              categoryIcon = Icons.home; // Biểu tượng nhà
-              break;
-            case 'food':
-              categoryIcon = Icons.fastfood; // Biểu tượng thức ăn
-              break;
-            case 'shopping':
-              categoryIcon = Icons.shopping_cart; // Biểu tượng giỏ hàng
-              break;
-            default:
-              categoryIcon = Icons.category; // Biểu tượng mặc định
-          }
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Icon(
-                  categoryIcon, // Sử dụng icon tương ứng
-                  color: Color(0xFFFF7C03), // Màu của biểu tượng
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    expense.categoryName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black,
-                      height: 1.5,
-                    ),
-                  ),
-                ),
-                Text(
-                  currencyFormat.format(expense.amount),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF003C5B), // Màu xanh đậm cho giá trị
-                    height: 1.5,
-                  ),
-                ),
-              ],
+        const SizedBox(height: 18),
+        if (topExpenses.isEmpty)
+          const Text(
+            "No expenses this month",
+            style: TextStyle(
+              color: Color(0xFF0D1B3D),
+              fontSize: 16,
             ),
-          );
-        }).toList(),
+          )
+        else
+          ...topExpenses.map((e) => _buildExpenseItem(e)),
       ],
     );
   }
+
+  Widget _buildExpenseItem(_ExpenseItem item) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 7),
+      child: Row(
+        children: [
+          Icon(item.icon, color: _categoryCubit.getCategoryIconColor(item.name), size: 28),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              item.name,
+              style: TextStyle(
+                color: AppColors.primaryVariant,
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Text(
+            _currencyFormat.format(item.amount),
+            style: TextStyle(
+              color: AppColors.primaryVariant,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ExpenseItem {
+  final String name;
+  final double amount;
+  final IconData icon;
+
+  _ExpenseItem(this.name, this.amount, this.icon);
 }

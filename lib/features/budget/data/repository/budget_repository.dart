@@ -18,4 +18,7 @@ class BudgetRepository {
   // Lưu ngân sách vào Supabase
   Future<void> saveBudget(BudgetModel budget) =>
       _remoteDataSource.saveBudget(budget);
+
+  Future<BudgetModel?> getBudgetByCategory(String categoryId) =>
+      _remoteDataSource.getBudgetByCategory(categoryId);
 }

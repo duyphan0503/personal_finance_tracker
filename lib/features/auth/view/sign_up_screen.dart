@@ -12,37 +12,39 @@ import '../../../shared/utils/validators.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
+    _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
-  void _signIn() {
+  void _signUp() {
     if (_formKey.currentState?.validate() ?? false) {
-      context.read<AuthCubit>().signInWithEmailAndPassword(
+      context.read<AuthCubit>().signUpWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text,
+        fullName: _fullNameController.text,
       );
     }
-  }
-
-  void _goToSignUp() {
-    context.go(AppRoutes.signUp);
   }
 
   @override
@@ -52,18 +54,21 @@ class _SignInScreenState extends State<SignInScreen> {
       body: BlocConsumer<AuthCubit, AuthState>(
         listener: (context, state) {
           if (state.status == AuthStatus.error) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.errorMessage ?? 'An error occurred'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            if (state.errorMessage?.contains('already') == true) {
+              NotificationService.showError('Email already in use');
+            } else {
+              NotificationService.showError(
+                state.errorMessage ?? 'An error occurred',
+              );
+            }
           } else if (state.status == AuthStatus.authenticated) {
             context.go(AppRoutes.dashboard);
-            NotificationService.showSuccess('Logged in successfully!');
+            NotificationService.showSuccess('Account created successfully!');
           }
         },
         builder: (context, state) {
+          final bool isLoading = state.status == AuthStatus.loading;
+
           return SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -71,29 +76,37 @@ class _SignInScreenState extends State<SignInScreen> {
                 child: Form(
                   key: _formKey,
                   child: Column(
-                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        'Welcome to Personal\nFinance Tracker',
-                        textAlign: TextAlign.center,
+                        "Sign Up",
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: 34,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primaryVariant,
-                          letterSpacing: -0.5,
+                          letterSpacing: -1,
                         ),
                       ),
-                      const SizedBox(height: 24),
-                      // Illustration
+                      const SizedBox(height: 22),
                       SizedBox(
                         height: 190,
                         child: Image.asset(
-                          Assets.images.signIn.path,
+                          Assets.images.signUp.path,
                           fit: BoxFit.contain,
                         ),
                       ),
                       const SizedBox(height: 28),
-                      // Email
+                      InputTextField(
+                        controller: _fullNameController,
+                        hintText: "Full Name",
+                        textInputAction: TextInputAction.next,
+                        validator:
+                            (value) => Validators.required(
+                              value,
+                              fieldName: 'full name',
+                            ),
+                      ),
+                      const SizedBox(height: 16),
                       InputTextField(
                         controller: _emailController,
                         hintText: "Email",
@@ -102,7 +115,6 @@ class _SignInScreenState extends State<SignInScreen> {
                         validator: Validators.email,
                       ),
                       const SizedBox(height: 16),
-                      // Password
                       InputTextField(
                         controller: _passwordController,
                         hintText: "Password",
@@ -114,26 +126,44 @@ class _SignInScreenState extends State<SignInScreen> {
                                 : Icons.visibility,
                             color: Colors.grey[400],
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
+                          onPressed:
+                              () => setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              }),
+                        ),
+                        textInputAction: TextInputAction.next,
+                        validator: Validators.password,
+                      ),
+                      const SizedBox(height: 16),
+                      InputTextField(
+                        controller: _confirmPasswordController,
+                        hintText: "Confirm Password",
+                        obscureText: _obscureConfirmPassword,
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                            color: Colors.grey[400],
+                          ),
+                          onPressed:
+                              () => setState(() {
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword;
+                              }),
                         ),
                         textInputAction: TextInputAction.done,
-                        validator: Validators.password,
-                        onFieldSubmitted: (_) => _signIn(),
+                        validator:
+                            (value) => Validators.confirmPassword(
+                              value,
+                              _passwordController.text,
+                            ),
                       ),
                       const SizedBox(height: 30),
-                      // Login Button
                       SizedBox(
                         width: double.infinity,
                         height: 54,
                         child: ElevatedButton(
-                          onPressed:
-                              state.status == AuthStatus.loading
-                                  ? null
-                                  : _signIn,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryButton,
                             shape: RoundedRectangleBorder(
@@ -141,8 +171,9 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                             elevation: 0,
                           ),
+                          onPressed: isLoading ? null : _signUp,
                           child:
-                              state.status == AuthStatus.loading
+                              isLoading
                                   ? const SizedBox(
                                     width: 24,
                                     height: 24,
@@ -152,17 +183,17 @@ class _SignInScreenState extends State<SignInScreen> {
                                     ),
                                   )
                                   : const Text(
-                                    "Login",
+                                    "Sign Up",
                                     style: AppTypography.h3,
                                   ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 22),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            "Don't have an account?",
+                            "Already have an account?",
                             style: TextStyle(
                               color: AppColors.primaryVariant,
                               fontSize: 17,
@@ -170,9 +201,11 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                           ),
                           TextButton(
-                            onPressed: _goToSignUp,
+                            onPressed: () {
+                              context.go(AppRoutes.signIn);
+                            },
                             child: const Text(
-                              "Sign Up",
+                              "Login",
                               style: TextStyle(
                                 color: AppColors.primaryButton,
                                 fontSize: 17,
@@ -182,7 +215,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),

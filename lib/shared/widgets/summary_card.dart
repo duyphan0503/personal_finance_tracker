@@ -12,7 +12,7 @@ class SummaryCard extends StatelessWidget {
     required this.title,
     required this.value,
     required this.color,
-    this.width = 120,
+    this.width = 100,
     this.height = 80,
   });
 

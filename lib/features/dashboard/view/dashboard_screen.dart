@@ -9,7 +9,7 @@ import 'package:personal_finance_tracker/shared/utils/format_utils.dart';
 import 'package:personal_finance_tracker/shared/widgets/summary_card.dart';
 
 import '../../../injection.dart';
-import '../../../shared/widgets/transactions/transaction_tile.dart';
+import '../../../shared/widgets/transaction_tile.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -77,20 +77,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      SummaryCard(
-                        title: 'INCOME',
-                        value: FormatUtils.formatCurrency(totalIncome),
-                        color: AppColors.incomeColor,
+                      Expanded(
+                        child: SummaryCard(
+                          title: 'INCOME',
+                          value: FormatUtils.formatCurrency(
+                            totalIncome,
+                            showDecimals: false,
+                          ),
+                          color: AppColors.incomeColor,
+                        ),
                       ),
-                      SummaryCard(
-                        title: 'EXPENSES',
-                        value: FormatUtils.formatCurrency(totalExpenses),
-                        color: AppColors.expenseColor,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: SummaryCard(
+                          title: 'EXPENSES',
+                          value: FormatUtils.formatCurrency(
+                            totalExpenses,
+                            showDecimals: false,
+                          ),
+                          color: AppColors.expenseColor,
+                        ),
                       ),
-                      SummaryCard(
-                        title: 'BALANCE',
-                        value: FormatUtils.formatCurrency(_getBalance()),
-                        color: AppColors.balanceColor,
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: SummaryCard(
+                          title: 'BALANCE',
+                          value: FormatUtils.formatCurrency(
+                            _getBalance(),
+                            showDecimals: false,
+                          ),
+                          color: AppColors.balanceColor,
+                        ),
                       ),
                     ],
                   ),
@@ -186,10 +203,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               state.recentTransactions[index].amount,
                               showDecimals: false,
                             ),
-                            subTrailing: FormatUtils.formatCurrency(
-                              state.recentTransactions[index].amount,
-                              showDecimals: false,
-                            ),
+                            margin: EdgeInsets.zero,
+                            showBorder: false,
                             iconLeadingStyle: IconThemeData(
                               color: _categoryCubit.getCategoryIconColor(
                                 state.recentTransactions[index].category!.name,
@@ -197,15 +212,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               size: 40,
                             ),
                           ),
-                          if (index != state.recentTransactions.length - 1)
-                            const Padding(
-                              padding: EdgeInsets.only(left: 58),
-                              child: Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: Color(0xFFE0E3E7),
-                              ),
-                            ),
                         ],
                       ),
                     ),

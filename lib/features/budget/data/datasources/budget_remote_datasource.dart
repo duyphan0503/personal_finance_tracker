@@ -70,4 +70,23 @@ class BudgetRemoteDataSource {
       throw Exception('Failed to save budget: ${e.toString()}');
     }
   }
+
+  Future<BudgetModel?> getBudgetByCategory(String categoryId) async {
+    try {
+      final userId = _client.auth.currentUser?.id;
+      if (userId == null) throw Exception('User not authenticated');
+
+      final response = await _client
+          .from('budgets')
+          .select()
+          .eq('category_id', categoryId)
+          .eq('user_id', userId)
+          .maybeSingle();
+
+      return response != null ? BudgetModel.fromJson(response) : null;
+    } catch (e) {
+      debugPrint('Error fetching budget: ${e.toString()}');
+      throw Exception('Failed to fetch budget: ${e.toString()}');
+    }
+  }
 }

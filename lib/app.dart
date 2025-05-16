@@ -4,10 +4,11 @@ import 'package:personal_finance_tracker/config/theme/app_theme.dart';
 import 'package:personal_finance_tracker/features/auth/cubit/auth_cubit.dart';
 import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart';
 import 'package:personal_finance_tracker/features/dashboard/cubit/dashboard_cubit.dart';
-import 'package:personal_finance_tracker/features/report/cubit/report_summary_cubit.dart';
+import 'package:personal_finance_tracker/features/report/cubit/report_cubit.dart';
 import 'package:personal_finance_tracker/features/transaction/cubit/transaction_cubit.dart';
 import 'package:personal_finance_tracker/injection.dart';
 import 'package:personal_finance_tracker/routes/app_routes.dart';
+import 'package:personal_finance_tracker/shared/services/notification_service.dart';
 
 import 'features/budget/cubit/budget_cubit.dart';
 
@@ -31,11 +32,10 @@ class _PersonalFinanceTrackerAppState extends State<PersonalFinanceTrackerApp> {
         BlocProvider<CategoryCubit>(create: (_) => getIt<CategoryCubit>()),
         BlocProvider<DashboardCubit>(create: (_) => getIt<DashboardCubit>()),
         BlocProvider<BudgetCubit>(create: (_) => getIt<BudgetCubit>()),
-        BlocProvider<ReportSummaryCubit>(
-          create: (_) => getIt<ReportSummaryCubit>(),
-        ),
+        BlocProvider<ReportCubit>(create: (_) => getIt<ReportCubit>()),
       ],
       child: MaterialApp.router(
+        scaffoldMessengerKey: NotificationService.messengerKey,
         title: 'Personal Finance Tracker',
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,

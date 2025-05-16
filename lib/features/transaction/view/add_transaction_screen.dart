@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart';
 import 'package:personal_finance_tracker/features/category/model/category_model.dart';
 import 'package:personal_finance_tracker/features/transaction/cubit/transaction_cubit.dart';
@@ -8,15 +8,16 @@ import 'package:personal_finance_tracker/injection.dart';
 import 'package:personal_finance_tracker/routes/app_routes.dart';
 import 'package:personal_finance_tracker/shared/services/notification_service.dart';
 import 'package:personal_finance_tracker/shared/utils/format_utils.dart';
+import 'package:personal_finance_tracker/shared/widgets/input_text_field.dart';
 
+import '../../../config/theme/app_colors.dart';
 import '../../category/cubit/category_state.dart';
-
-const _navyColor = Color(0xFF0A2E60);
-const _orangeColor = Color(0xFFFFA726);
-const _lightBackground = Color(0xFFF4F6F8);
+import '../model/transaction_model.dart';
 
 class AddTransactionScreen extends StatefulWidget {
-  const AddTransactionScreen({super.key});
+  final TransactionModel? transaction;
+
+  const AddTransactionScreen({super.key, this.transaction});
 
   @override
   State<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -32,14 +33,18 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   String _selectedCategoryName = 'Housing';
   IconData _selectedCategoryIcon = Icons.home;
   DateTime _selectedDate = DateTime.now();
-  bool _isSubmitting = false;
 
   @override
   void initState() {
     super.initState();
     _categoryCubit = getIt<CategoryCubit>();
     _transactionCubit = getIt<TransactionCubit>();
-    _initializeDefaultCategory();
+    _amountController.addListener(_onAmountChanged);
+    if (widget.transaction != null) {
+      _initEditTransaction(widget.transaction!);
+    } else {
+      _initializeDefaultCategory();
+    }
   }
 
   Future<void> _initializeDefaultCategory() async {
@@ -59,6 +64,19 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     }
   }
 
+  void _initEditTransaction(TransactionModel transaction) async {
+    await _categoryCubit.fetchCategories();
+    _selectedCategory = transaction.category;
+    _selectedCategoryName = transaction.category?.name ?? '';
+    _selectedCategoryIcon = _categoryCubit.getCategoryIcon(
+      _selectedCategoryName,
+    );
+    _selectedDate = transaction.transactionDate;
+    _amountController.text = transaction.amount.toString();
+    _noteController.text = transaction.note ?? '';
+    setState(() {});
+  }
+
   Future<void> _selectDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -69,9 +87,9 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
           (context, child) => Theme(
             data: Theme.of(context).copyWith(
               colorScheme: const ColorScheme.light(
-                primary: _orangeColor,
+                primary: AppColors.primaryButton,
                 onPrimary: Colors.white,
-                onSurface: _navyColor,
+                onSurface: AppColors.primaryVariant,
               ),
             ),
             child: child!,
@@ -93,22 +111,8 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     }
   }
 
-  void _onAmountChanged(String value) {
-    String cleaned = value.replaceAll('\$', '').replaceAll(',', '').trim();
-    if (cleaned.isEmpty) {
-      _amountController.text = '';
-      _amountController.selection = const TextSelection.collapsed(offset: 0);
-      return;
-    }
-    double? val = double.tryParse(cleaned);
-    if (val != null && val >= 0) {
-      final formatted = NumberFormat("#,##0.00", "en_US").format(val);
-      final newText = '\$$formatted';
-      _amountController.value = TextEditingValue(
-        text: newText,
-        selection: TextSelection.collapsed(offset: newText.length),
-      );
-    }
+  void _onAmountChanged() {
+    setState(() {});
   }
 
   Future<void> _submit() async {
@@ -116,34 +120,32 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       NotificationService.showError('Please select a category');
       return;
     }
-    String input =
-        _amountController.text.replaceAll('\$', '').replaceAll(',', '').trim();
-    if (input.isEmpty) {
+    if (_amountController.text.isEmpty) {
       NotificationService.showError('Please enter an amount');
       return;
     }
-    double? amount = double.tryParse(input);
+    double? amount = double.tryParse(_amountController.text);
     if (amount == null || amount <= 0) {
       NotificationService.showError('Invalid amount');
       return;
     }
-
-    setState(() => _isSubmitting = true);
-    try {
-      await _transactionCubit.addTransaction(
+    if (widget.transaction != null) {
+      // Update
+      _transactionCubit.updateTransaction(
+        id: widget.transaction!.id,
         categoryId: _selectedCategory!.id,
         amount: amount,
         note: _noteController.text.trim(),
         date: _selectedDate,
       );
-      if (mounted) {
-        Navigator.of(context).pop(true);
-      }
-    } catch (e) {
-      setState(() => _isSubmitting = false);
-      if (mounted) {
-        NotificationService.showError('Error: ${e.toString()}');
-      }
+    } else {
+      // Add new
+      _transactionCubit.addTransaction(
+        categoryId: _selectedCategory!.id,
+        amount: amount,
+        note: _noteController.text.trim(),
+        date: _selectedDate,
+      );
     }
   }
 
@@ -153,68 +155,73 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
       _selectedCategoryName,
     );
 
+    String displayAmount = FormatUtils.formatCurrency(
+      double.tryParse(_amountController.text) ?? 0,
+      showDecimals: true,
+    );
+
+    final bool isEditing = widget.transaction != null;
+
     return Scaffold(
-      backgroundColor: _lightBackground,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: _navyColor),
-        backgroundColor: _lightBackground,
+        iconTheme: const IconThemeData(color: AppColors.primaryVariant),
+        backgroundColor: AppColors.background,
         elevation: 0,
       ),
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
+      body: BlocListener<TransactionCubit, TransactionState>(
+        bloc: _transactionCubit,
+        listener: (context, state) {
+          if (state is TransactionLoaded) {
+            NotificationService.showSuccess(
+              isEditing
+                  ? 'Transaction updated successfully'
+                  : 'Transaction added successfully',
+            );
+            context.go(AppRoutes.dashboard);
+          } else if (state is TransactionError) {
+            NotificationService.showError(state.message);
+          }
+        },
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 8),
-              const Text(
-                'Add Transaction',
-                style: TextStyle(
-                  color: _navyColor,
+              Text(
+                isEditing ? 'Edit Transaction' : 'Add Transaction',
+                style: const TextStyle(
+                  color: AppColors.primaryVariant,
                   fontWeight: FontWeight.bold,
                   fontSize: 30,
                   letterSpacing: -1,
                 ),
               ),
-              const SizedBox(height: 32),
-              // Amount input
-              _AmountInput(
-                controller: _amountController,
-                onChanged: _onAmountChanged,
-              ),
-              const SizedBox(height: 28),
-              const _SectionLabel(text: 'Note'),
-              const SizedBox(height: 7),
-              TextField(
-                controller: _noteController,
-                style: const TextStyle(fontSize: 16, color: _navyColor),
-                decoration: InputDecoration(
-                  hintText: 'Write a note',
-                  hintStyle: TextStyle(color: _navyColor.withOpacity(0.35)),
-                  filled: true,
-                  fillColor: Colors.white,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 15,
-                    vertical: 14,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(11),
-                    borderSide: BorderSide(color: _navyColor.withOpacity(0.12)),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(11),
-                    borderSide: BorderSide(color: _navyColor.withOpacity(0.12)),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(11),
-                    borderSide: BorderSide(color: _orangeColor, width: 2),
-                  ),
+              const SizedBox(height: 16),
+              Text(
+                _amountController.text.isEmpty ? '\$0.00' : displayAmount,
+                style: TextStyle(
+                  color: AppColors.primaryVariant,
+                  fontSize: 48,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
+              const SizedBox(height: 16),
+              _InputField(
+                prefixIcon: const Icon(Icons.attach_money),
+                label: 'Amount',
+                controller: _amountController,
+                hintText: 'Amount',
+                keyboardType: TextInputType.number,
+              ),
               const SizedBox(height: 22),
-              const _SectionLabel(text: 'Category'),
-              const SizedBox(height: 7),
+              _InputField(
+                label: 'Note',
+                controller: _noteController,
+                hintText: 'Write a note',
+                keyboardType: TextInputType.text,
+              ),
+              const SizedBox(height: 22),
               GestureDetector(
                 onTap: _selectCategory,
                 child: Container(
@@ -224,7 +231,6 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                     vertical: 14,
                   ),
                   decoration: BoxDecoration(
-                    color: categoryColor.withOpacity(0.08),
                     border: Border.all(color: categoryColor, width: 2),
                     borderRadius: BorderRadius.circular(11),
                   ),
@@ -239,19 +245,21 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                       Text(
                         _selectedCategoryName,
                         style: const TextStyle(
-                          color: _navyColor,
+                          color: AppColors.primaryVariant,
                           fontWeight: FontWeight.w600,
                           fontSize: 17,
                         ),
                       ),
                       const Spacer(),
-                      const Icon(Icons.chevron_right, color: _navyColor),
+                      const Icon(
+                        Icons.chevron_right,
+                        color: AppColors.primaryVariant,
+                      ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 22),
-              const _SectionLabel(text: 'Date'),
               const SizedBox(height: 7),
               GestureDetector(
                 onTap: _selectDate,
@@ -263,58 +271,67 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    border: Border.all(color: _navyColor.withOpacity(0.12)),
-                    borderRadius: BorderRadius.circular(11),
+                    border: Border.all(color: Colors.blue.shade50),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     children: [
                       Text(
                         FormatUtils.formatDateSimple(_selectedDate),
                         style: const TextStyle(
-                          color: _navyColor,
+                          color: AppColors.primaryVariant,
                           fontWeight: FontWeight.w600,
                           fontSize: 17,
                         ),
                       ),
                       const Spacer(),
-                      const Icon(Icons.chevron_right, color: _navyColor),
+                      const Icon(
+                        Icons.chevron_right,
+                        color: AppColors.primaryVariant,
+                      ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(height: 40),
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _orangeColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+              BlocBuilder<TransactionCubit, TransactionState>(
+                bloc: _transactionCubit,
+                builder: (context, state) {
+                  final isLoading = state is TransactionLoading;
+                  return SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryButton,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        elevation: 0,
+                      ),
+                      onPressed: isLoading ? null : _submit,
+                      child:
+                          isLoading
+                              ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2.8,
+                                ),
+                              )
+                              : Text(
+                                isEditing ? 'Update' : 'Add',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
                     ),
-                    elevation: 0,
-                  ),
-                  onPressed: _isSubmitting ? null : _submit,
-                  child:
-                      _isSubmitting
-                          ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2.8,
-                            ),
-                          )
-                          : const Text(
-                            'Add',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 19,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                ),
+                  );
+                },
               ),
               const SizedBox(height: 26),
             ],
@@ -332,62 +349,42 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
   }
 }
 
-class _SectionLabel extends StatelessWidget {
-  final String text;
-
-  const _SectionLabel({required this.text});
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(
-        text,
-        style: TextStyle(
-          color: _navyColor.withOpacity(0.7),
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-}
-
-class _AmountInput extends StatelessWidget {
+class _InputField extends StatelessWidget {
   final TextEditingController controller;
-  final void Function(String) onChanged;
+  final String? hintText;
+  final String? label;
+  final Widget? prefixIcon;
+  final TextInputType keyboardType;
 
-  const _AmountInput({required this.controller, required this.onChanged});
+  const _InputField({
+    required this.controller,
+    this.hintText,
+    this.label,
+    this.prefixIcon,
+    this.keyboardType = TextInputType.text,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      textAlign: TextAlign.center,
-      style: const TextStyle(
-        color: _navyColor,
-        fontWeight: FontWeight.bold,
-        fontSize: 44,
-        letterSpacing: -2,
-      ),
-      decoration: const InputDecoration(
-        hintText: '\$0.00',
-        hintStyle: TextStyle(
-          color: Color(0xFFB0B3B8),
-          fontWeight: FontWeight.bold,
-          fontSize: 44,
-          letterSpacing: -2,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label ?? '',
+          style: const TextStyle(
+            color: AppColors.primaryVariant,
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-        border: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        isDense: true,
-        contentPadding: EdgeInsets.zero,
-        filled: true,
-        fillColor: Colors.transparent,
-      ),
-      onChanged: onChanged,
+        const SizedBox(height: 7),
+        InputTextField(
+          prefixIcon: prefixIcon,
+          controller: controller,
+          hintText: hintText ?? '',
+          keyboardType: keyboardType,
+        ),
+      ],
     );
   }
 }

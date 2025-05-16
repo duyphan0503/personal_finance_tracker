@@ -1,6 +1,8 @@
 import 'package:injectable/injectable.dart';
-import 'package:personal_finance_tracker/features/report/data/datasources/report_summary_remote_datasource.dart';
+
 import 'package:personal_finance_tracker/features/transaction/model/transaction_model.dart';
+
+import '../datasources/report_summary_remote_datasource.dart';
 
 @lazySingleton
 class ReportSummaryRepository {

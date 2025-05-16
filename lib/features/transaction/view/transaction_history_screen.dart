@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart';
 import 'package:personal_finance_tracker/shared/services/notification_service.dart';
 import 'package:personal_finance_tracker/shared/utils/format_utils.dart';
-import 'package:personal_finance_tracker/shared/widgets/transactions/transaction_tile.dart';
+import 'package:personal_finance_tracker/shared/widgets/transaction_tile.dart';
 
 import '../cubit/transaction_cubit.dart';
 

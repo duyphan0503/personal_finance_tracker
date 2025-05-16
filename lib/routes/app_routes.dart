@@ -1,21 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:personal_finance_tracker/config/theme/app_colors.dart';
 import 'package:personal_finance_tracker/features/auth/view/sign_in_screen.dart';
-import 'package:personal_finance_tracker/features/report/summary/view/report_summary_screen.dart';
+import 'package:personal_finance_tracker/features/auth/view/sign_up_screen.dart';
+import 'package:personal_finance_tracker/features/category/view/select_category_screen.dart';
+import 'package:personal_finance_tracker/features/report/view/report_screen.dart';
+import 'package:personal_finance_tracker/features/report/view/report_summary_screen.dart';
+import 'package:personal_finance_tracker/features/settings/view/notification_screen.dart';
+import 'package:personal_finance_tracker/features/transaction/view/add_transaction_screen.dart';
 import 'package:personal_finance_tracker/features/transaction/view/transaction_history_screen.dart';
 
 import '../features/dashboard/view/dashboard_screen.dart';
+import '../features/settings/view/account_security_screen.dart';
 
 class AppRoutes {
   // Route name constants
   static const String signIn = '/signIn';
+  static const String signUp = '/signUp';
   static const String dashboard = '/dashboard';
   static const String transactionsHistory = '/transactionsHistory';
   static const String transactionDetail = '/transactions/:id';
   static const String addTransaction = '/transactions/add';
+
   static const String report = '/report';
   static const String settings = '/settings';
-  static const String reportSummaryScreen = '/report_summary_screen';
+  static const String budget = '/budget';
+  static const String reportSummary = '/report-summary';
+  static const String selectCategory = '/selectCategory';
+
+  static const String accountSecurity = '/accountSecurity';
+
+  static const String notifications = '/notifications';
 }
 
 class AppRouter {
@@ -25,11 +40,24 @@ class AppRouter {
   // GoRouter configuration
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRoutes.reportSummaryScreen,
+    initialLocation: AppRoutes.signIn,
+
     routes: [
       GoRoute(
         path: AppRoutes.signIn,
         builder: (context, state) => const SignInScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.signUp,
+        builder: (context, state) => const SignUpScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.reportSummary,
+        builder: (context, state) => const ReportSummaryScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.selectCategory,
+        builder: (context, state) => const SelectCategoryScreen(),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,
@@ -43,21 +71,24 @@ class AppRouter {
           ),
           GoRoute(
             path: AppRoutes.addTransaction,
-            builder: (context, state) => const Placeholder(),
+            builder: (context, state) => const AddTransactionScreen(),
           ),
           GoRoute(
             path: AppRoutes.transactionsHistory,
             builder: (context, state) => const TransactionHistoryScreen(),
           ),
           GoRoute(
-            path: AppRoutes.reportSummaryScreen,
-            builder: (context, state) => const ReportSummaryScreen(),
+            path: AppRoutes.report,
+            builder: (context, state) => const ReportScreen(),
+          ),
+          GoRoute(
+            path: AppRoutes.notifications,
+            builder: (context, state) => const NotificationScreen(),
           ),
           GoRoute(
             path: AppRoutes.settings,
-            builder: (context, state) => const Placeholder(),
+            builder: (context, state) => const AccountSecurityScreen(),
           ),
-
         ],
       ),
     ],
@@ -76,22 +107,78 @@ class ScaffoldWithBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _calculateSelectedIndex(context),
-        onTap: (index) => _onItemTapped(index, context),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Add'),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
-            label: 'Reports',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          SizedBox(height: MediaQuery.of(context).size.height, child: child),
+
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              height: kBottomNavigationBarHeight + 12,
+              decoration: BoxDecoration(color: Colors.transparent),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: AppColors.tileBorder, width: 1),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.shade100,
+                        blurRadius: 4,
+                        offset: const Offset(0, -2),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20),
+                    ),
+                    child: BottomNavigationBar(
+                      type: BottomNavigationBarType.fixed,
+                      elevation: 0,
+                      backgroundColor: Colors.white,
+                      currentIndex: _calculateSelectedIndex(context),
+                      onTap: (index) => _onItemTapped(index, context),
+                      items: const [
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.home),
+                          label: 'Home',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.add),
+                          label: 'Add',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.history),
+                          label: 'History',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.bar_chart),
+                          label: 'Reports',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.notifications),
+                          label: 'Notifications',
+                        ),
+                        BottomNavigationBarItem(
+                          icon: Icon(Icons.settings),
+                          label: 'Settings',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -103,8 +190,10 @@ class ScaffoldWithBottomNav extends StatelessWidget {
     if (location.startsWith(AppRoutes.dashboard)) return 0;
     if (location.startsWith(AppRoutes.addTransaction)) return 1;
     if (location.startsWith(AppRoutes.transactionsHistory)) return 2;
-    if (location.startsWith(AppRoutes.reportSummaryScreen)) return 3;
-    if (location.startsWith(AppRoutes.settings)) return 4;
+
+    if (location.startsWith(AppRoutes.report)) return 3;
+    if (location.startsWith(AppRoutes.notifications)) return 4;
+    if (location.startsWith(AppRoutes.settings)) return 5;
     return 0;
   }
 
@@ -120,9 +209,12 @@ class ScaffoldWithBottomNav extends StatelessWidget {
         context.go(AppRoutes.transactionsHistory);
         break;
       case 3:
-        context.go(AppRoutes.reportSummaryScreen);
+        context.go(AppRoutes.report);
         break;
       case 4:
+        context.go(AppRoutes.notifications);
+        break;
+      case 5:
         context.go(AppRoutes.settings);
         break;
     }

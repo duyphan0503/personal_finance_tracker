@@ -17,7 +17,7 @@ class NotificationService {
 
   static void showSuccess(
     String message, {
-    Duration duration = const Duration(seconds: 3),
+    Duration duration = const Duration(seconds: 2),
   }) {
     _showSnackBar(
       message,

@@ -11,11 +11,12 @@ class TransactionLoading extends TransactionState {}
 
 class TransactionLoaded extends TransactionState {
   final List<TransactionModel> transactions;
+  final bool hasMore;
 
-  TransactionLoaded(this.transactions);
+  TransactionLoaded(this.transactions, {this.hasMore = false});
 
   @override
-  List<Object?> get props => [transactions];
+  List<Object?> get props => [transactions, hasMore];
 }
 
 class TransactionDeleted extends TransactionState {}

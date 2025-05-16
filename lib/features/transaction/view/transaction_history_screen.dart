@@ -22,13 +22,61 @@ class TransactionHistoryScreen extends StatefulWidget {
 class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   late final TransactionCubit _transactionCubit;
   late final CategoryCubit _categoryCubit;
+  final ScrollController _scrollController = ScrollController();
+
+  int _pageSize = 7; // mặc định
 
   @override
   void initState() {
     super.initState();
     _transactionCubit = context.read<TransactionCubit>();
     _categoryCubit = context.read<CategoryCubit>();
-    _transactionCubit.fetchAllTransactions();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final height = MediaQuery.of(context).size.height;
+      final appBarHeight = Scaffold.of(context).appBarMaxHeight ?? 56;
+      final paddingTop = MediaQuery.of(context).padding.top;
+      final availableHeight = height - appBarHeight - paddingTop - 100;
+
+      const itemHeight = 90; // ước lượng chiều cao mỗi item
+      final itemsFit = (availableHeight / itemHeight).ceil();
+
+      setState(() {
+        _pageSize = itemsFit > 0 ? itemsFit : 7;
+      });
+
+      _transactionCubit.fetchInitialTransactionsWithLimit(_pageSize);
+    });
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200) {
+        _transactionCubit.fetchMoreTransactions(_pageSize);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _editTransaction(BuildContext context, TransactionModel transaction) {
+    context.go(AppRoutes.addTransaction, extra: transaction);
+  }
+
+  void _deleteTransaction(BuildContext context, TransactionModel transaction) async {
+    bool confirm = await NotificationService.showConfirmDialog(
+      context: context,
+      title: 'Delete Transaction',
+      content: "Are you sure you want to delete this transaction?",
+      cancelText: 'Cancel',
+      confirmText: 'Delete',
+    );
+    if (confirm && context.mounted) {
+      await context.read<TransactionCubit>().deleteTransaction(transaction.id);
+    }
   }
 
   @override
@@ -56,7 +104,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Today', style: TextStyle(fontSize: 16)),
+              const Text('Today', style: TextStyle(fontSize: 16)),
               Expanded(
                 child: BlocBuilder<TransactionCubit, TransactionState>(
                   builder: (context, state) {
@@ -71,8 +119,17 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                       }
 
                       return ListView.builder(
-                        itemCount: transactions.length,
+                        controller: _scrollController,
+                        itemCount: state.hasMore
+                            ? transactions.length + 1
+                            : transactions.length,
                         itemBuilder: (context, index) {
+                          if (index == transactions.length) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              child: Center(child: CircularProgressIndicator()),
+                            );
+                          }
                           final transaction = transactions[index];
                           return Dismissible(
                             key: Key(transaction.id),
@@ -120,7 +177,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                                   transaction.category!.name,
                                 ),
                               ),
-                              titleStyle: TextStyle(fontSize: 16),
+                              titleStyle: const TextStyle(fontSize: 16),
                               trailingStyle: TextStyle(
                                 fontSize: 16,
                                 color:
@@ -128,7 +185,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                                     ? Colors.green
                                     : Colors.red,
                               ),
-                              subTrailingStyle: TextStyle(fontSize: 14),
+                              subTrailingStyle: const TextStyle(fontSize: 14),
                             ),
                           );
                         },
@@ -144,25 +201,5 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
         ),
       ),
     );
-  }
-
-  void _editTransaction(BuildContext context, transaction) {
-    context.go(AppRoutes.addTransaction, extra: transaction);
-  }
-
-  void _deleteTransaction(
-      BuildContext context,
-      TransactionModel transaction,
-      ) async {
-    bool confirm = await NotificationService.showConfirmDialog(
-      context: context,
-      title: 'Delete Transaction',
-      content: "Are you sure you want to delete this transaction?",
-      cancelText: 'Cancel',
-      confirmText: 'Delete',
-    );
-    if (confirm && context.mounted) {
-      await context.read<TransactionCubit>().deleteTransaction(transaction.id);
-    }
   }
 }

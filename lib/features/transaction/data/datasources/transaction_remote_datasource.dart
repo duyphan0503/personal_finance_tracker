@@ -8,22 +8,27 @@ class TransactionRemoteDataSource {
   final SupabaseClient _client;
 
   TransactionRemoteDataSource(SupabaseClient? client)
-    : _client = client ?? Supabase.instance.client;
+      : _client = client ?? Supabase.instance.client;
 
-  Future<List<TransactionModel>> fetchTransactions() async {
+  Future<List<TransactionModel>> fetchTransactions({
+    int limit = 10,
+    int offset = 0,
+  }) async {
     try {
       await Supabase.instance.client.auth.refreshSession();
       final res = await _client
           .from('transactions')
           .select('*,categories(*)')
           .eq('user_id', "${_client.auth.currentUser?.id}")
-          .order('transaction_date', ascending: false);
+          .order('transaction_date', ascending: false)
+          .range(offset, offset + limit - 1);
       return res.map((data) => TransactionModel.fromJson(data)).toList();
     } catch (e) {
       throw Exception('Failed to fetch transactions: $e');
     }
   }
 
+  // Các phương thức create/update/delete giữ nguyên
   Future<TransactionModel> createTransaction({
     required String categoryId,
     required double amount,
@@ -36,7 +41,6 @@ class TransactionRemoteDataSource {
         throw Exception('No active session');
       }
 
-      // Check if token is expired
       if (session.isExpired) {
         await _client.auth.refreshSession();
       }
@@ -54,11 +58,11 @@ class TransactionRemoteDataSource {
         'user_id': currentUser.id,
       };
       final res =
-          await _client
-              .from('transactions')
-              .insert(payload)
-              .select('*,categories(*)')
-              .single();
+      await _client
+          .from('transactions')
+          .insert(payload)
+          .select('*,categories(*)')
+          .single();
       return TransactionModel.fromJson(res);
     } catch (e) {
       throw Exception('Failed to create transaction: $e');
@@ -81,13 +85,13 @@ class TransactionRemoteDataSource {
         changes['transaction_date'] = date.toUtc().toIso8601String();
       }
       final res =
-          await _client
-              .from('transactions')
-              .update(changes)
-              .eq('id', id)
-              .eq('user_id', "${_client.auth.currentUser?.id}")
-              .select('*,categories(*)')
-              .single();
+      await _client
+          .from('transactions')
+          .update(changes)
+          .eq('id', id)
+          .eq('user_id', "${_client.auth.currentUser?.id}")
+          .select('*,categories(*)')
+          .single();
       return TransactionModel.fromJson(res);
     } catch (e) {
       throw Exception('Failed to update transaction: $e');
@@ -96,7 +100,7 @@ class TransactionRemoteDataSource {
 
   Future<void> deleteTransaction(String id) async {
     try {
-      final res = await _client.from('transactions').delete().eq('id', id);
+      await _client.from('transactions').delete().eq('id', id);
     } catch (e) {
       throw Exception('Failed to delete transaction: $e');
     }

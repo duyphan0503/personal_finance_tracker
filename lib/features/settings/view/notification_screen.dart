@@ -47,7 +47,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Header at the top
           const Padding(
             padding: EdgeInsets.only(bottom: 16),
             child: Text(
@@ -61,7 +60,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
             ),
           ),
 
-          // Transaction Reminder notification item
           _buildNotificationItem(
             title: 'Transaction Reminder',
             description: 'Remind to add your expenses and incomes daily',
@@ -79,14 +77,30 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Budget Limit notification item
           _buildNotificationItem(
             title: 'Budget Limit',
             description: 'Notify when nearing your budget limit',
             value: _budgetLimitEnabled,
             onChanged: (value) async {
               if (value) {
-                _showSetBudgetDialog();
+                final result = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const BudgetScreen(),
+                  ),
+                );
+
+                if (result == true) {
+                  setState(() {
+                    _budgetLimitEnabled = true;
+                  });
+                  _saveSettings();
+                  NotificationService.showSuccess('Budget limit notifications enabled');
+                } else {
+                  setState(() {
+                    _budgetLimitEnabled = false;
+                  });
+                }
               } else {
                 setState(() {
                   _budgetLimitEnabled = false;
@@ -98,7 +112,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Tip & Recommendations notification item
           _buildNotificationItem(
             title: 'Tip & Recommendations',
             description: 'Get helpful suggestions for managing your finances',
@@ -119,111 +132,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
     );
   }
 
-  // Dialog to set budget
-  void _showSetBudgetDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text(
-                  'No budgets set',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'You haven\'t set a budget for any\ncategories. Would you like to set\none now?',
-                  style: TextStyle(
-                    fontSize: 15,
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pop(context); // Đóng dialog
-                        },
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                        ),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFFF8915),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(context); // Đóng dialog
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const BudgetScreen(),
-                            ),
-                          ).then((result) {
-                            if (result == true) {
-                              // Nếu kết quả là 'true', đánh dấu là đã bật
-                              setState(() {
-                                _budgetLimitEnabled = true;
-                              });
-                            } else {
-                              // Nếu kết quả là 'false', reset về trạng thái chưa chọn
-                              setState(() {
-                                _budgetLimitEnabled = false;
-                              });
-                            }
-                            _saveSettings(); // Lưu trạng thái cập nhật
-                          });
-                        },
-                        child: const Text(
-                          'Set Budget',
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-
-  // Build a notification item
   Widget _buildNotificationItem({
     required String title,
     required String description,

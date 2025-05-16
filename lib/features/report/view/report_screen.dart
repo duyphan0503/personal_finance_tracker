@@ -19,18 +19,17 @@ class ReportScreen extends StatefulWidget {
 
 class _ReportScreenState extends State<ReportScreen>
     with SingleTickerProviderStateMixin {
-  late final ReportCubit _summaryCubit;
+  late final ReportCubit _reportCubit;
   late final TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    _summaryCubit =
-        getIt<ReportCubit>()..loadReport(
-          type: 'summary',
-          filter: {'month': DateTime.now().month, 'year': DateTime.now().year},
-        );
-
+    _reportCubit = getIt<ReportCubit>()
+      ..loadReport(
+        type: 'summary',
+        filter: {'month': DateTime.now().month, 'year': DateTime.now().year},
+      );
     _tabController = TabController(length: 3, vsync: this);
   }
 
@@ -74,7 +73,7 @@ class _ReportScreenState extends State<ReportScreen>
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ReportCubit, ReportState>(
-      bloc: _summaryCubit,
+      bloc: _reportCubit, // Fixed: Added the required cubit parameter
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
@@ -90,13 +89,11 @@ class _ReportScreenState extends State<ReportScreen>
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                // Summary cards or loader
                 if (state is ReportLoading)
                   const Center(child: CircularProgressIndicator())
                 else if (state is ReportSummaryLoaded)
                   _buildSummaryCards(state)
                 else
-                  // fallback empty row to keep layout
                   Row(
                     children: const [
                       Expanded(child: SizedBox()),
@@ -106,18 +103,12 @@ class _ReportScreenState extends State<ReportScreen>
                       Expanded(child: SizedBox()),
                     ],
                   ),
-
                 const SizedBox(height: 12),
-
-                // Custom TabBar (redesigned to match image 2)
                 _ReportCustomTabBar(
                   controller: _tabController,
                   tabs: const ['Monthly', 'Category', 'Summary'],
                 ),
-
                 const SizedBox(height: 12),
-
-                // Tab views
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
@@ -199,6 +190,7 @@ class _ReportScreenState extends State<ReportScreen>
   @override
   void dispose() {
     _tabController.dispose();
+    _reportCubit.close();
     super.dispose();
   }
 }
@@ -248,18 +240,23 @@ class _ReportCustomTabBarState extends State<_ReportCustomTabBar> {
       ),
       child: Row(
         children: List.generate(widget.tabs.length, (i) {
+          final isSelected = _selectedTab == i;
           return Expanded(
             child: GestureDetector(
-              onTap: () {
-                widget.controller.animateTo(i);
-              },
+              onTap: () => widget.controller.animateTo(i),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.ease,
                 margin: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
+                  color: isSelected ? const Color(0xFFFFEFE1) : Colors.transparent,
                   borderRadius: BorderRadius.circular(24),
+                  border: isSelected
+                      ? Border.all(
+                    color: const Color(0xFFFF8915),
+                    width: 2,
+                  )
+                      : null,
                 ),
                 child: Center(
                   child: Text(

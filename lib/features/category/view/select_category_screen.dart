@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/features/category/cubit/category_cubit.dart';
 import 'package:personal_finance_tracker/features/category/model/category_model.dart';
+import '../../../config/theme/app_colors.dart';
 import '../cubit/category_state.dart';
 
 class SelectCategoryScreen extends StatefulWidget {
@@ -33,9 +34,9 @@ class _SelectCategoryScreenState extends State<SelectCategoryScreen> {
       appBar: AppBar(
         title: const Text('Select Category',
             style: TextStyle(
-              fontSize: 40,
+              fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: AppColors.primaryVariant,
             )),
       ),
       body: BlocBuilder<CategoryCubit, CategoryState>(
@@ -108,27 +109,27 @@ class _SelectCategoryScreenState extends State<SelectCategoryScreen> {
 
     return InkWell(
       onTap: () {
-        Future.microtask(() {
-          context.pop(category);
+        context.pop(category);
+      },
+      onLongPress: () {
+        setState(() {
+          _selectedCategory = category;
         });
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFFFF0E2) : null, // Màu nền khi chọn
-          border: Border.all(
-            color: isSelected ? const Color(0xFFFDB06A) : Color(0xFFE6E6F8), // Viền màu xám khi chưa chọn
-            width: 2,
-          ),
           borderRadius: BorderRadius.circular(15),
+          border: isSelected
+              ? Border.all(color: iconColor, width: 2)
+              : null,
         ),
         child: ListTile(
           leading: Icon(iconData, color: iconColor),
           title: Text(category.name,
               style: TextStyle(
                 fontSize: 20,
-                //fontWeight: FontWeight.w500,
-                color: Colors.black,
+                color: AppColors.primaryVariant,
               )),
         ),
       ),

@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // Để sử dụng SystemNavigator
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:personal_finance_tracker/features/auth/cubit/auth_cubit.dart';
+import 'package:personal_finance_tracker/routes/app_routes.dart';
+
+import '../../../injection.dart'; // Để sử dụng SystemNavigator
 
 class AccountSecurityScreen extends StatefulWidget {
   const AccountSecurityScreen({super.key});
@@ -10,6 +15,13 @@ class AccountSecurityScreen extends StatefulWidget {
 
 class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
   bool isTwoFactorEnabled = false; // Biến theo dõi trạng thái của switch 2FA
+  late final AuthCubit _authCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _authCubit = getIt<AuthCubit>();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,8 +149,8 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Đóng ứng dụng
-              SystemNavigator.pop(); // Đóng ứng dụng và quay lại màn hình chính
+              _authCubit.signOut();
+              context.go(AppRoutes.signIn);
             },
             child: const Text(
               'Log Out',

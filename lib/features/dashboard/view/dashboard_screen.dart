@@ -197,15 +197,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               size: 40,
                             ),
                           ),
-                          if (index != state.recentTransactions.length - 1)
-                            const Padding(
-                              padding: EdgeInsets.only(left: 58),
-                              child: Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: Color(0xFFE0E3E7),
-                              ),
-                            ),
                         ],
                       ),
                     ),

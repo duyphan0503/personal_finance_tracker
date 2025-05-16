@@ -138,6 +138,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                   },
                 ),
               ),
+              const SizedBox(height: 50),
             ],
           ),
         ),

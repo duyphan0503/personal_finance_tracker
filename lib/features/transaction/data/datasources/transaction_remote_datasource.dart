@@ -81,12 +81,13 @@ class TransactionRemoteDataSource {
         changes['transaction_date'] = date.toUtc().toIso8601String();
       }
       final res =
-      await _client
-          .from('transactions')
-          .update(changes)
-          .eq('id', id)
-          .select('*,categories(*)')
-          .single();
+          await _client
+              .from('transactions')
+              .update(changes)
+              .eq('id', id)
+              .eq('user_id', "${_client.auth.currentUser?.id}")
+              .select('*,categories(*)')
+              .single();
       return TransactionModel.fromJson(res);
     } catch (e) {
       throw Exception('Failed to update transaction: $e');
@@ -101,5 +102,3 @@ class TransactionRemoteDataSource {
     }
   }
 }
-
-

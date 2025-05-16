@@ -18,7 +18,10 @@ class ReportRemoteDataSource {
       final int? year = filter['year'];
       final String? categoryId = filter['categoryId'];
 
-      var query = _client.from('transactions').select('*, categories(*)');
+      var query = _client
+          .from('transactions')
+          .select('*, categories(*)')
+          .eq('user_id', '${_client.auth.currentUser?.id}');
 
       if (month != null && year != null) {
         final startDate = DateTime(year, month, 1);

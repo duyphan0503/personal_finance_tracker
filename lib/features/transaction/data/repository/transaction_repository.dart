@@ -9,8 +9,11 @@ class TransactionRepository {
 
   TransactionRepository(this.remoteDataSource);
 
-  Future<List<TransactionModel>> fetchTransactions() =>
-      remoteDataSource.fetchTransactions();
+  Future<List<TransactionModel>> fetchTransactions({
+    int limit = 10,
+    int offset = 0,
+  }) => remoteDataSource.fetchTransactions(limit: limit, offset: offset);
+
 
   Future<TransactionModel> createTransaction({
     required String categoryId,

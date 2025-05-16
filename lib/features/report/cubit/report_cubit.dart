@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:injectable/injectable.dart';
 
 import '../../category/model/category_model.dart';
 import '../../transaction/model/transaction_model.dart';
@@ -7,6 +8,7 @@ import '../data/repository/report_repository.dart';
 
 part 'report_state.dart';
 
+@injectable
 class ReportCubit extends Cubit<ReportState> {
   final ReportRepository _repository;
 

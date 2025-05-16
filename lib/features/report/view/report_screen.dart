@@ -109,17 +109,10 @@ class _ReportScreenState extends State<ReportScreen>
 
                 const SizedBox(height: 12),
 
-                // Tab bar
-                TabBar(
+                // Custom TabBar (redesigned to match image 2)
+                _ReportCustomTabBar(
                   controller: _tabController,
-                  labelColor: AppColors.primaryVariant,
-                  unselectedLabelColor: AppColors.orange,
-                  indicatorColor: AppColors.primaryVariant,
-                  tabs: const [
-                    Tab(text: 'Monthly'),
-                    Tab(text: 'Category'),
-                    Tab(text: 'Summary'),
-                  ],
+                  tabs: const ['Monthly', 'Category', 'Summary'],
                 ),
 
                 const SizedBox(height: 12),
@@ -207,5 +200,82 @@ class _ReportScreenState extends State<ReportScreen>
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+}
+
+class _ReportCustomTabBar extends StatefulWidget {
+  final TabController controller;
+  final List<String> tabs;
+
+  const _ReportCustomTabBar({required this.controller, required this.tabs});
+
+  @override
+  State<_ReportCustomTabBar> createState() => _ReportCustomTabBarState();
+}
+
+class _ReportCustomTabBarState extends State<_ReportCustomTabBar> {
+  late int _selectedTab;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedTab = widget.controller.index;
+    widget.controller.addListener(_handleTabChange);
+  }
+
+  void _handleTabChange() {
+    if (_selectedTab != widget.controller.index) {
+      setState(() {
+        _selectedTab = widget.controller.index;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_handleTabChange);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 52,
+      margin: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF6F7FB),
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: List.generate(widget.tabs.length, (i) {
+          return Expanded(
+            child: GestureDetector(
+              onTap: () {
+                widget.controller.animateTo(i);
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.ease,
+                margin: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                child: Center(
+                  child: Text(
+                    widget.tabs[i],
+                    style: TextStyle(
+                      color: const Color(0xFF11214A),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
   }
 }

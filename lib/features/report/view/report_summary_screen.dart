@@ -30,6 +30,39 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
     _categoryCubit = getIt<CategoryCubit>();
   }
 
+  Future<void> _selectMonth(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedMonth,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
+      initialDatePickerMode: DatePickerMode.year,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF003C5B), // header background color
+              onPrimary: Colors.white, // header text color
+              onSurface: Color(0xFF0D1B3D), // body text color
+            ),
+            dialogTheme: DialogTheme(
+              backgroundColor: Colors.white,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null && picked != _selectedMonth) {
+      setState(() {
+        _selectedMonth = DateTime(picked.year, picked.month);
+        _loadData();
+      });
+    }
+  }
+
   void _loadData() {
     context.read<ReportCubit>().loadReport(
       type: 'summary',
@@ -125,18 +158,28 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFD8A4),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: Text(
-            DateFormat('MMMM yyyy').format(_selectedMonth),
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF003C5B),
-              fontSize: 18,
+        GestureDetector(
+          onTap: () => _selectMonth(context),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFD8A4),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  DateFormat('MMMM yyyy').format(_selectedMonth),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF003C5B),
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.keyboard_arrow_down, color: Color(0xFF003C5B)),
+              ],
             ),
           ),
         ),

@@ -2,21 +2,24 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../shared/utils/format_utils.dart';
+import '../../category/model/category_model.dart';
 import '../data/repository/transaction_repository.dart';
 import '../model/transaction_model.dart';
-
+import '../../budget/data/repository/budget_repository.dart';
 part 'transaction_state.dart';
 
 @injectable
 class TransactionCubit extends Cubit<TransactionState> {
   final TransactionRepository _repository;
+  final BudgetRepository _budgetRepository;
 
   int _currentOffset = 0;
   bool _hasMore = true;
   bool _isLoadingMore = false;
   final List<TransactionModel> _transactions = [];
 
-  TransactionCubit(this._repository) : super(TransactionInitial());
+  TransactionCubit(this._repository,this._budgetRepository) : super(TransactionInitial());
 
   Future<void> fetchInitialTransactionsWithLimit(int limit) async {
     try {
@@ -63,8 +66,40 @@ class TransactionCubit extends Cubit<TransactionState> {
     String? note,
     DateTime? date,
   }) async {
-    emit(TransactionLoading());
     try {
+      emit(TransactionLoading());
+
+      // Check if transaction amount exceeds budget
+      final budget = await _budgetRepository.getBudgetByCategory(categoryId);
+      if (budget != null && amount > 0) { // Only check for positive amounts (expenses)
+        // Calculate total already spent in this category (only expenses)
+        double alreadySpent = 0;
+
+        // Filter transactions for this category and type
+        for (final tx in _transactions) {
+          if (tx.categoryId == categoryId &&
+              tx.category?.type.name == 'expense' &&
+              tx.amount < 0) { // Negative amounts represent expenses
+            alreadySpent += tx.amount.abs();
+          }
+        }
+
+        // Calculate what the new total would be
+        final newTotal = alreadySpent + amount.abs();
+
+        if (newTotal > budget.amount) {
+          final remainingBudget = budget.amount - alreadySpent;
+          emit(TransactionError(
+              'Adding this transaction would exceed the budget limit.\n'
+                  'Budget: ${FormatUtils.formatCurrency(budget.amount)}\n'
+                  'Already spent: ${FormatUtils.formatCurrency(alreadySpent)}\n'
+                  'This transaction: ${FormatUtils.formatCurrency(amount.abs())}\n'
+                  'Remaining budget: ${FormatUtils.formatCurrency(remainingBudget)}'
+          ));
+          return;
+        }
+      }
+
       final newTransaction = await _repository.createTransaction(
         categoryId: categoryId,
         amount: amount,

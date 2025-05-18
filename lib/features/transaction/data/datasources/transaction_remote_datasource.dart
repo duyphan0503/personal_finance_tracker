@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../model/transaction_model.dart';
@@ -8,7 +9,7 @@ class TransactionRemoteDataSource {
   final SupabaseClient _client;
 
   TransactionRemoteDataSource(SupabaseClient? client)
-      : _client = client ?? Supabase.instance.client;
+    : _client = client ?? Supabase.instance.client;
 
   Future<List<TransactionModel>> fetchTransactions({
     int limit = 10,
@@ -54,15 +55,17 @@ class TransactionRemoteDataSource {
         'category_id': categoryId,
         'amount': amount,
         'note': note,
-        'transaction_date': (date ?? DateTime.now()).toUtc().toIso8601String(),
+        'transaction_date': DateFormat(
+          'yyyy-MM-dd',
+        ).format(date ?? DateTime.now()),
         'user_id': currentUser.id,
       };
       final res =
-      await _client
-          .from('transactions')
-          .insert(payload)
-          .select('*,categories(*)')
-          .single();
+          await _client
+              .from('transactions')
+              .insert(payload)
+              .select('*,categories(*)')
+              .single();
       return TransactionModel.fromJson(res);
     } catch (e) {
       throw Exception('Failed to create transaction: $e');
@@ -82,16 +85,16 @@ class TransactionRemoteDataSource {
       if (amount != null) changes['amount'] = amount;
       if (note != null) changes['note'] = note;
       if (date != null) {
-        changes['transaction_date'] = date.toUtc().toIso8601String();
+        changes['transaction_date'] = DateFormat('yyyy-MM-dd').format(date);
       }
       final res =
-      await _client
-          .from('transactions')
-          .update(changes)
-          .eq('id', id)
-          .eq('user_id', "${_client.auth.currentUser?.id}")
-          .select('*,categories(*)')
-          .single();
+          await _client
+              .from('transactions')
+              .update(changes)
+              .eq('id', id)
+              .eq('user_id', "${_client.auth.currentUser?.id}")
+              .select('*,categories(*)')
+              .single();
       return TransactionModel.fromJson(res);
     } catch (e) {
       throw Exception('Failed to update transaction: $e');

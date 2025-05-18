@@ -37,6 +37,113 @@ class _NotificationScreenState extends State<NotificationScreen> {
     prefs.setBool('tipRecommendations', _tipRecommendationsEnabled);
   }
 
+  // Dialog to set budget
+  void _showSetBudgetDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'No budgets set',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'You haven\'t set a budget for any\ncategories. Would you like to set\none now?',
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.5,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Close dialog
+                          setState(() {
+                            _budgetLimitEnabled = false; // Keep switch off if canceled
+                          });
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFFF8915),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context); // Close dialog
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const BudgetScreen(),
+                            ),
+                          ).then((result) {
+                            if (result == true) {
+                              // If result is 'true', enable the switch
+                              setState(() {
+                                _budgetLimitEnabled = true;
+                              });
+                              _saveSettings();
+                              NotificationService.showSuccess('Budget limit notifications enabled');
+                            } else {
+                              // If result is 'false', keep switch off
+                              setState(() {
+                                _budgetLimitEnabled = false;
+                              });
+                            }
+                          });
+                        },
+                        child: const Text(
+                          'Set Budget',
+                          style: TextStyle(
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,25 +190,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
             value: _budgetLimitEnabled,
             onChanged: (value) async {
               if (value) {
-                final result = await Navigator.push<bool>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const BudgetScreen(),
-                  ),
-                );
-
-                if (result == true) {
-                  setState(() {
-                    _budgetLimitEnabled = true;
-                  });
-                  _saveSettings();
-                  NotificationService.showSuccess('Budget limit notifications enabled');
-                } else {
-                  setState(() {
-                    _budgetLimitEnabled = false;
-                  });
-                }
+                // Show dialog when trying to enable
+                _showSetBudgetDialog();
               } else {
+                // Directly disable if turning off
                 setState(() {
                   _budgetLimitEnabled = false;
                 });

@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 import 'package:personal_finance_tracker/features/category/model/category_model.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 @lazySingleton
 class CategoryRemoteDataSource {
-  final SupabaseClient _client;
+  final FirebaseFirestore _firestore;
 
-  CategoryRemoteDataSource(SupabaseClient? client)
-    : _client = client ?? Supabase.instance.client;
+  CategoryRemoteDataSource(FirebaseFirestore? firestore)
+    : _firestore = firestore ?? FirebaseFirestore.instance;
 
   Future<List<CategoryModel>> fetchCategories() async {
     try {
-      final res = await _client
-          .from('categories')
-          .select()
-          .order('name', ascending: true);
+      final querySnapshot = await _firestore
+          .collection('categories')
+          .orderBy('name')
+          .get();
 
-      return (res as List).map((data) => CategoryModel.fromJson(data)).toList();
+      return querySnapshot.docs
+          .map((doc) => CategoryModel.fromJson({
+                'id': doc.id,
+                ...doc.data(),
+              }))
+          .toList();
     } catch (e) {
       debugPrint('Error fetching categories: $e');
       throw Exception('Failed to fetch categories: ${e.toString()}');

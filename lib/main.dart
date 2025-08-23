@@ -3,13 +3,18 @@ import 'package:personal_finance_tracker/app.dart';
 import 'package:personal_finance_tracker/features/auth/data/repositories/auth_repository.dart';
 import 'package:personal_finance_tracker/injection.dart';
 
-import 'config/supabase_config.dart';
+import 'config/firebase_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await initSupabase();
+  // Initialize Firebase
+  await initFirebase();
+  
+  // Configure dependency injection
   configureDependencies();
+  
+  // Initialize authentication listener
   await getIt<AuthRepository>().initAuthListener();
 
   runApp(const PersonalFinanceTrackerApp());

@@ -1,35 +1,69 @@
 import 'package:injectable/injectable.dart';
 import 'package:intl/intl.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../model/transaction_model.dart';
 
 @lazySingleton
 class TransactionRemoteDataSource {
-  final SupabaseClient _client;
+  final FirebaseFirestore _firestore;
+  final FirebaseAuth _auth;
 
-  TransactionRemoteDataSource(SupabaseClient? client)
-    : _client = client ?? Supabase.instance.client;
+  TransactionRemoteDataSource(
+    FirebaseFirestore? firestore,
+    FirebaseAuth? auth,
+  )   : _firestore = firestore ?? FirebaseFirestore.instance,
+        _auth = auth ?? FirebaseAuth.instance;
 
   Future<List<TransactionModel>> fetchTransactions({
     int limit = 10,
     int offset = 0,
   }) async {
     try {
-      await Supabase.instance.client.auth.refreshSession();
-      final res = await _client
-          .from('transactions')
-          .select('*,categories(*)')
-          .eq('user_id', "${_client.auth.currentUser?.id}")
-          .order('transaction_date', ascending: false)
-          .range(offset, offset + limit - 1);
-      return res.map((data) => TransactionModel.fromJson(data)).toList();
+      final user = _auth.currentUser;
+      if (user == null) throw Exception('User not authenticated');
+
+      final querySnapshot = await _firestore
+          .collection('transactions')
+          .where('user_id', isEqualTo: user.uid)
+          .orderBy('transaction_date', descending: true)
+          .limit(limit)
+          .get();
+
+      List<TransactionModel> transactions = [];
+      
+      for (var doc in querySnapshot.docs) {
+        final data = doc.data();
+        
+        // Fetch category data
+        DocumentSnapshot? categoryDoc;
+        if (data['category_id'] != null) {
+          categoryDoc = await _firestore
+              .collection('categories')
+              .doc(data['category_id'])
+              .get();
+        }
+
+        final transactionData = {
+          'id': doc.id,
+          ...data,
+          if (categoryDoc != null && categoryDoc.exists)
+            'categories': {
+              'id': categoryDoc.id,
+              ...categoryDoc.data() as Map<String, dynamic>,
+            },
+        };
+
+        transactions.add(TransactionModel.fromJson(transactionData));
+      }
+
+      return transactions;
     } catch (e) {
       throw Exception('Failed to fetch transactions: $e');
     }
   }
 
-  // Các phương thức create/update/delete giữ nguyên
   Future<TransactionModel> createTransaction({
     required String categoryId,
     required double amount,
@@ -37,36 +71,45 @@ class TransactionRemoteDataSource {
     DateTime? date,
   }) async {
     try {
-      final session = _client.auth.currentSession;
-      if (session == null) {
-        throw Exception('No active session');
-      }
+      final user = _auth.currentUser;
+      if (user == null) throw Exception('User not authenticated');
 
-      if (session.isExpired) {
-        await _client.auth.refreshSession();
-      }
-
-      final currentUser = _client.auth.currentUser;
-      if (currentUser == null) {
-        throw Exception('User not authenticated');
-      }
-
+      final transactionDate = date ?? DateTime.now();
       final payload = {
         'category_id': categoryId,
         'amount': amount,
         'note': note,
-        'transaction_date': DateFormat(
-          'yyyy-MM-dd',
-        ).format(date ?? DateTime.now()),
-        'user_id': currentUser.id,
+        'transaction_date': Timestamp.fromDate(transactionDate),
+        'user_id': user.uid,
+        'created_at': FieldValue.serverTimestamp(),
+        'updated_at': FieldValue.serverTimestamp(),
       };
-      final res =
-          await _client
-              .from('transactions')
-              .insert(payload)
-              .select('*,categories(*)')
-              .single();
-      return TransactionModel.fromJson(res);
+
+      final docRef = await _firestore
+          .collection('transactions')
+          .add(payload);
+
+      // Fetch the created transaction with category data
+      final doc = await docRef.get();
+      final data = doc.data()!;
+      
+      // Fetch category data
+      final categoryDoc = await _firestore
+          .collection('categories')
+          .doc(categoryId)
+          .get();
+
+      final transactionData = {
+        'id': doc.id,
+        ...data,
+        if (categoryDoc.exists)
+          'categories': {
+            'id': categoryDoc.id,
+            ...categoryDoc.data()!,
+          },
+      };
+
+      return TransactionModel.fromJson(transactionData);
     } catch (e) {
       throw Exception('Failed to create transaction: $e');
     }
@@ -80,22 +123,51 @@ class TransactionRemoteDataSource {
     DateTime? date,
   }) async {
     try {
-      final Map<String, dynamic> changes = {};
-      if (categoryId != null) changes['category_id'] = categoryId;
-      if (amount != null) changes['amount'] = amount;
-      if (note != null) changes['note'] = note;
-      if (date != null) {
-        changes['transaction_date'] = DateFormat('yyyy-MM-dd').format(date);
+      final user = _auth.currentUser;
+      if (user == null) throw Exception('User not authenticated');
+
+      final Map<String, dynamic> updates = {
+        'updated_at': FieldValue.serverTimestamp(),
+      };
+      
+      if (categoryId != null) updates['category_id'] = categoryId;
+      if (amount != null) updates['amount'] = amount;
+      if (note != null) updates['note'] = note;
+      if (date != null) updates['transaction_date'] = Timestamp.fromDate(date);
+
+      await _firestore
+          .collection('transactions')
+          .doc(id)
+          .update(updates);
+
+      // Fetch the updated transaction with category data
+      final doc = await _firestore
+          .collection('transactions')
+          .doc(id)
+          .get();
+      
+      final data = doc.data()!;
+      
+      // Fetch category data
+      DocumentSnapshot? categoryDoc;
+      if (data['category_id'] != null) {
+        categoryDoc = await _firestore
+            .collection('categories')
+            .doc(data['category_id'])
+            .get();
       }
-      final res =
-          await _client
-              .from('transactions')
-              .update(changes)
-              .eq('id', id)
-              .eq('user_id', "${_client.auth.currentUser?.id}")
-              .select('*,categories(*)')
-              .single();
-      return TransactionModel.fromJson(res);
+
+      final transactionData = {
+        'id': doc.id,
+        ...data,
+        if (categoryDoc != null && categoryDoc.exists)
+          'categories': {
+            'id': categoryDoc.id,
+            ...categoryDoc.data() as Map<String, dynamic>,
+          },
+      };
+
+      return TransactionModel.fromJson(transactionData);
     } catch (e) {
       throw Exception('Failed to update transaction: $e');
     }
@@ -103,7 +175,7 @@ class TransactionRemoteDataSource {
 
   Future<void> deleteTransaction(String id) async {
     try {
-      await _client.from('transactions').delete().eq('id', id);
+      await _firestore.collection('transactions').doc(id).delete();
     } catch (e) {
       throw Exception('Failed to delete transaction: $e');
     }

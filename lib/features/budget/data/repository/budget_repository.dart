@@ -11,11 +11,11 @@ class BudgetRepository {
 
   BudgetRepository(this._remoteDataSource, this._categoryRemoteDataSource);
 
-  // Lấy danh mục từ Supabase
+  // Get categories from Firebase
   Future<List<CategoryModel>> fetchCategories() =>
       _categoryRemoteDataSource.fetchCategories();
 
-  // Lưu ngân sách vào Supabase
+  // Save budget to Firebase
   Future<void> saveBudget(BudgetModel budget) =>
       _remoteDataSource.saveBudget(budget);
 

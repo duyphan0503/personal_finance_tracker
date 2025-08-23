@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 enum AuthStatus { initial, loading, authenticated, unauthenticated, error }
 

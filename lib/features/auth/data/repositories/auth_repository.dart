@@ -1,6 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:personal_finance_tracker/features/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 @lazySingleton
 class AuthRepository {
@@ -18,7 +18,7 @@ class AuthRepository {
     return await _dataSource.getCurrentUser();
   }
 
-  Future<AuthResponse> signInWithEmailAndPassword({
+  Future<UserCredential> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
@@ -28,7 +28,7 @@ class AuthRepository {
     );
   }
 
-  Future<AuthResponse> signUpWithEmailAndPassword({
+  Future<UserCredential> signUpWithEmailAndPassword({
     required String email,
     required String password,
     required String fullName,
@@ -44,7 +44,7 @@ class AuthRepository {
     await _dataSource.signOut();
   }
 
-  Stream<AuthState> authStateChanges() {
+  Stream<User?> authStateChanges() {
     return _dataSource.authStateChanges();
   }
 }

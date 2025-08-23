@@ -2,19 +2,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:injectable/injectable.dart';
 import 'package:personal_finance_tracker/features/category/data/datasources/category_remote_datasource.dart';
 import 'package:personal_finance_tracker/features/category/model/category_model.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../model/budget_model.dart';
 
 @lazySingleton
 class BudgetRemoteDataSource {
-  final SupabaseClient _client;
+  final FirebaseFirestore _firestore;
+  final FirebaseAuth _auth;
   final CategoryRemoteDataSource _categoryRemoteDataSource;
 
   BudgetRemoteDataSource(
-      this._client,
-      this._categoryRemoteDataSource,
-      );
+    FirebaseFirestore? firestore,
+    FirebaseAuth? auth,
+    this._categoryRemoteDataSource,
+  )   : _firestore = firestore ?? FirebaseFirestore.instance,
+        _auth = auth ?? FirebaseAuth.instance;
 
   Future<List<CategoryModel>> fetchCategories() async {
     try {
@@ -25,45 +29,40 @@ class BudgetRemoteDataSource {
     }
   }
 
-
   Future<void> saveBudget(BudgetModel budget) async {
     try {
-      final userId = _client.auth.currentUser?.id;
-      if (userId == null) throw Exception('User not authenticated');
+      final user = _auth.currentUser;
+      if (user == null) throw Exception('User not authenticated');
 
       final payload = {
-        'user_id': userId,
+        'user_id': user.uid,
         'amount': budget.amount,
         'category_id': budget.categoryId,
+        'updated_at': FieldValue.serverTimestamp(),
       };
 
-      // Kiểm tra xem budget cho category này đã tồn tại chưa
-      final existingBudget = await _client
-          .from('budgets')
-          .select()
-          .eq('category_id', budget.categoryId)
-          .eq('user_id', userId)
-          .maybeSingle();
+      // Check if budget for this category already exists
+      final existingBudget = await _firestore
+          .collection('budgets')
+          .where('category_id', isEqualTo: budget.categoryId)
+          .where('user_id', isEqualTo: user.uid)
+          .limit(1)
+          .get();
 
-      dynamic response; // Khai báo kiểu rõ ràng
-      if (existingBudget != null) {
-        // Nếu đã tồn tại thì update
-        response = await _client
-            .from('budgets')
-            .update(payload)
-            .eq('category_id', budget.categoryId)
-            .eq('user_id', userId)
-            .select()
-            .single();
-        debugPrint('Budget updated successfully: $response');
+      if (existingBudget.docs.isNotEmpty) {
+        // Update existing budget
+        await _firestore
+            .collection('budgets')
+            .doc(existingBudget.docs.first.id)
+            .update(payload);
+        debugPrint('Budget updated successfully');
       } else {
-        // Nếu chưa tồn tại thì insert mới
-        response = await _client
-            .from('budgets')
-            .insert(payload)
-            .select()
-            .single();
-        debugPrint('Budget saved successfully: $response');
+        // Create new budget
+        payload['created_at'] = FieldValue.serverTimestamp();
+        await _firestore
+            .collection('budgets')
+            .add(payload);
+        debugPrint('Budget created successfully');
       }
     } catch (e) {
       debugPrint('Error saving budget: ${e.toString()}');
@@ -73,17 +72,25 @@ class BudgetRemoteDataSource {
 
   Future<BudgetModel?> getBudgetByCategory(String categoryId) async {
     try {
-      final userId = _client.auth.currentUser?.id;
-      if (userId == null) throw Exception('User not authenticated');
+      final user = _auth.currentUser;
+      if (user == null) throw Exception('User not authenticated');
 
-      final response = await _client
-          .from('budgets')
-          .select()
-          .eq('category_id', categoryId)
-          .eq('user_id', userId)
-          .maybeSingle();
+      final querySnapshot = await _firestore
+          .collection('budgets')
+          .where('category_id', isEqualTo: categoryId)
+          .where('user_id', isEqualTo: user.uid)
+          .limit(1)
+          .get();
 
-      return response != null ? BudgetModel.fromJson(response) : null;
+      if (querySnapshot.docs.isNotEmpty) {
+        final doc = querySnapshot.docs.first;
+        return BudgetModel.fromJson({
+          'id': doc.id,
+          ...doc.data(),
+        });
+      }
+
+      return null;
     } catch (e) {
       debugPrint('Error fetching budget: ${e.toString()}');
       throw Exception('Failed to fetch budget: ${e.toString()}');

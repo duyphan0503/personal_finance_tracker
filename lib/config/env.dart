@@ -1,5 +1,10 @@
-const String supUrl = "https://klakpukphqlawzcntdxe.supabase.co";
-const String supApiKey =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtsYWtwdWtwaHFsYXd6Y250ZHhlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MjA5NTIsImV4cCI6MjA2MjE5Njk1Mn0.bF5hvAYfm9zEUbhRYpDHiy_16sAMIJzb5xuRm1zCrNY";
+// Firebase configuration constants
+const String firebaseApiKey = "your-firebase-api-key";
+const String firebaseAuthDomain = "your-project.firebaseapp.com";
+const String firebaseProjectId = "your-project-id";
+const String firebaseStorageBucket = "your-project.appspot.com";
+const String firebaseMessagingSenderId = "123456789";
+const String firebaseAppId = "1:123456789:web:abcdef123456";
 
-const String authUrl = "$supUrl/auth/v1";
+// Development environment configuration
+const bool isDevelopment = true;

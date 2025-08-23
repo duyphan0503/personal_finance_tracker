@@ -122,5 +122,17 @@ app.*.symbols
 # IDE
 .idea/
 
-# Env
+# Env and Firebase configuration
 lib/config/env.dart
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+web/firebase-config.js
+
+# Firebase
+.firebase/
+firebase.json
+.firebaserc
+
+# Generated files
+**/*.freezed.dart
+**/*.g.dart

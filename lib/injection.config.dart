@@ -9,6 +9,8 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:cloud_firestore/cloud_firestore.dart' as _i974;
+import 'package:firebase_auth/firebase_auth.dart' as _i59;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:personal_finance_tracker/features/auth/cubit/auth_cubit.dart'
@@ -55,9 +57,8 @@ import 'package:personal_finance_tracker/features/transaction/data/repository/tr
     as _i1067;
 import 'package:personal_finance_tracker/features/transaction/model/transaction_model.dart'
     as _i854;
-import 'package:personal_finance_tracker/register_supabase_module.dart'
+import 'package:personal_finance_tracker/register_firebase_module.dart'
     as _i906;
-import 'package:supabase_flutter/supabase_flutter.dart' as _i454;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -66,10 +67,17 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
-    final registerSupabaseModule = _$RegisterSupabaseModule();
-    gh.lazySingleton<_i454.SupabaseClient>(
-      () => registerSupabaseModule.supabaseClient,
+    final registerFirebaseModule = _$RegisterFirebaseModule();
+    
+    // Register Firebase services
+    gh.lazySingleton<_i59.FirebaseAuth>(
+      () => registerFirebaseModule.firebaseAuth,
     );
+    gh.lazySingleton<_i974.FirebaseFirestore>(
+      () => registerFirebaseModule.firebaseFirestore,
+    );
+    
+    // Register models
     gh.factory<_i800.CategoryModel>(
       () => _i800.CategoryModel(
         id: gh<String>(),
@@ -85,39 +93,6 @@ extension GetItInjectableX on _i174.GetIt {
         category: gh<_i800.CategoryModel>(),
       ),
     );
-    gh.lazySingleton<_i589.CategoryRemoteDataSource>(
-      () => _i589.CategoryRemoteDataSource(gh<_i454.SupabaseClient>()),
-    );
-    gh.lazySingleton<_i330.ReportRemoteDataSource>(
-      () => _i330.ReportRemoteDataSource(gh<_i454.SupabaseClient>()),
-    );
-    gh.lazySingleton<_i114.TransactionRemoteDataSource>(
-      () => _i114.TransactionRemoteDataSource(gh<_i454.SupabaseClient>()),
-    );
-    gh.lazySingleton<_i993.ReportSummaryRemoteDataSource>(
-      () => _i993.ReportSummaryRemoteDataSource(gh<_i454.SupabaseClient>()),
-    );
-    gh.lazySingleton<_i125.CategoryRepository>(
-      () => _i125.CategoryRepository(gh<_i589.CategoryRemoteDataSource>()),
-    );
-    gh.lazySingleton<_i1067.TransactionRepository>(
-      () =>
-          _i1067.TransactionRepository(gh<_i114.TransactionRemoteDataSource>()),
-    );
-    gh.lazySingleton<_i621.ReportSummaryRepository>(
-      () => _i621.ReportSummaryRepository(
-        gh<_i993.ReportSummaryRemoteDataSource>(),
-      ),
-    );
-    gh.lazySingleton<_i417.BudgetRemoteDataSource>(
-      () => _i417.BudgetRemoteDataSource(
-        gh<_i454.SupabaseClient>(),
-        gh<_i589.CategoryRemoteDataSource>(),
-      ),
-    );
-    gh.factory<_i988.DashboardCubit>(
-      () => _i988.DashboardCubit(gh<_i1067.TransactionRepository>()),
-    );
     gh.factory<_i854.TransactionModel>(
       () => _i854.TransactionModel(
         id: gh<String>(),
@@ -130,22 +105,57 @@ extension GetItInjectableX on _i174.GetIt {
         createdAt: gh<DateTime>(),
       ),
     );
-    gh.lazySingleton<_i1070.ReportRepository>(
-      () => _i1070.ReportRepository(gh<_i330.ReportRemoteDataSource>()),
+    
+    // Register data sources
+    gh.lazySingleton<_i589.CategoryRemoteDataSource>(
+      () => _i589.CategoryRemoteDataSource(gh<_i974.FirebaseFirestore>()),
+    );
+    gh.lazySingleton<_i330.ReportRemoteDataSource>(
+      () => _i330.ReportRemoteDataSource(
+        gh<_i974.FirebaseFirestore>(),
+        gh<_i59.FirebaseAuth>(),
+      ),
+    );
+    gh.lazySingleton<_i114.TransactionRemoteDataSource>(
+      () => _i114.TransactionRemoteDataSource(
+        gh<_i974.FirebaseFirestore>(),
+        gh<_i59.FirebaseAuth>(),
+      ),
+    );
+    gh.lazySingleton<_i993.ReportSummaryRemoteDataSource>(
+      () => _i993.ReportSummaryRemoteDataSource(
+        gh<_i974.FirebaseFirestore>(),
+        gh<_i59.FirebaseAuth>(),
+      ),
+    );
+    gh.lazySingleton<_i417.BudgetRemoteDataSource>(
+      () => _i417.BudgetRemoteDataSource(
+        gh<_i974.FirebaseFirestore>(),
+        gh<_i59.FirebaseAuth>(),
+        gh<_i589.CategoryRemoteDataSource>(),
+      ),
     );
     gh.lazySingleton<_i387.AuthRemoteDataSource>(
       () => _i387.AuthRemoteDataSource(
-        supabaseClient: gh<_i454.SupabaseClient>(),
+        firebaseAuth: gh<_i59.FirebaseAuth>(),
+        firestore: gh<_i974.FirebaseFirestore>(),
       ),
     );
-    gh.factory<_i688.CategoryCubit>(
-      () => _i688.CategoryCubit(gh<_i125.CategoryRepository>()),
+    
+    // Register repositories
+    gh.lazySingleton<_i125.CategoryRepository>(
+      () => _i125.CategoryRepository(gh<_i589.CategoryRemoteDataSource>()),
     );
-    gh.factory<_i39.ReportSummaryCubit>(
-      () => _i39.ReportSummaryCubit(gh<_i621.ReportSummaryRepository>()),
+    gh.lazySingleton<_i1067.TransactionRepository>(
+      () => _i1067.TransactionRepository(gh<_i114.TransactionRemoteDataSource>()),
     );
-    gh.factory<_i741.ReportCubit>(
-      () => _i741.ReportCubit(gh<_i1070.ReportRepository>()),
+    gh.lazySingleton<_i621.ReportSummaryRepository>(
+      () => _i621.ReportSummaryRepository(
+        gh<_i993.ReportSummaryRemoteDataSource>(),
+      ),
+    );
+    gh.lazySingleton<_i1070.ReportRepository>(
+      () => _i1070.ReportRepository(gh<_i330.ReportRemoteDataSource>()),
     );
     gh.lazySingleton<_i441.AuthRepository>(
       () => _i441.AuthRepository(dataSource: gh<_i387.AuthRemoteDataSource>()),
@@ -155,6 +165,20 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i417.BudgetRemoteDataSource>(),
         gh<_i589.CategoryRemoteDataSource>(),
       ),
+    );
+    
+    // Register cubits
+    gh.factory<_i988.DashboardCubit>(
+      () => _i988.DashboardCubit(gh<_i1067.TransactionRepository>()),
+    );
+    gh.factory<_i688.CategoryCubit>(
+      () => _i688.CategoryCubit(gh<_i125.CategoryRepository>()),
+    );
+    gh.factory<_i39.ReportSummaryCubit>(
+      () => _i39.ReportSummaryCubit(gh<_i621.ReportSummaryRepository>()),
+    );
+    gh.factory<_i741.ReportCubit>(
+      () => _i741.ReportCubit(gh<_i1070.ReportRepository>()),
     );
     gh.factory<_i540.BudgetCubit>(
       () => _i540.BudgetCubit(gh<_i480.BudgetRepository>()),
@@ -168,8 +192,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i480.BudgetRepository>(),
       ),
     );
+    
     return this;
   }
 }
 
-class _$RegisterSupabaseModule extends _i906.RegisterSupabaseModule {}
+class _$RegisterFirebaseModule extends _i906.RegisterFirebaseModule {}

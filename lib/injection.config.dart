@@ -59,6 +59,8 @@ import 'package:personal_finance_tracker/features/transaction/model/transaction_
     as _i854;
 import 'package:personal_finance_tracker/register_firebase_module.dart'
     as _i906;
+import 'package:personal_finance_tracker/shared/services/firebase_initialization_service.dart'
+    as _i123;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -140,6 +142,11 @@ extension GetItInjectableX on _i174.GetIt {
         firebaseAuth: gh<_i59.FirebaseAuth>(),
         firestore: gh<_i974.FirebaseFirestore>(),
       ),
+    );
+    
+    // Register services
+    gh.lazySingleton<_i123.FirebaseInitializationService>(
+      () => _i123.FirebaseInitializationService(gh<_i974.FirebaseFirestore>()),
     );
     
     // Register repositories

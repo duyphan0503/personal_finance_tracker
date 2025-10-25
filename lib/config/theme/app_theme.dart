@@ -43,7 +43,7 @@ class AppTheme {
     ),
 
     // Card
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: 0,
       color: AppColors.surface,
       margin: const EdgeInsets.all(8),
@@ -129,7 +129,7 @@ class AppTheme {
       iconTheme: const IconThemeData(color: Colors.white),
     ),
 
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       elevation: 0,
       color: const Color(0xFF1E1E1E),
       margin: const EdgeInsets.all(8),

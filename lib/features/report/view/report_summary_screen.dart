@@ -46,7 +46,7 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
               onPrimary: Colors.white, // header text color
               onSurface: Color(0xFF0D1B3D), // body text color
             ),
-            dialogTheme: DialogTheme(
+            dialogTheme: DialogThemeData(
               backgroundColor: Colors.white,
             ),
           ),

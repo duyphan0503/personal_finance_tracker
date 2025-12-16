@@ -8,6 +8,7 @@ This project is used as a **training internship project** and demonstrates real-
 ---
 
 ## 🚀 Features
+
 - 🔐 Authentication with **Supabase Auth (PKCE)**
 - 💰 Income & Expense management (CRUD)
 - 🏷 Category tagging for transactions
@@ -22,11 +23,13 @@ This project is used as a **training internship project** and demonstrates real-
 ## 🛠 Tech Stack
 
 ### Mobile
+
 - **Flutter** (Dart 3)
 - Material 3
 - Responsive UI
 
 ### Architecture & State Management
+
 - Clean Architecture
 - Feature-based structure
 - **Cubit (flutter_bloc)**
@@ -34,6 +37,7 @@ This project is used as a **training internship project** and demonstrates real-
 - DI: **GetIt** & **Injectable**
 
 ### Backend & Networking
+
 - **Supabase**
   - Auth (PKCE)
   - Postgres database
@@ -41,14 +45,17 @@ This project is used as a **training internship project** and demonstrates real-
 - REST API (via Supabase SDK)
 
 ### Data & Storage
+
 - Flutter Secure Storage (session persistence)
 - shared_preferences
 
 ### UI & Visualization
+
 - fl_chart (reports & analytics)
 - go_router (navigation)
 
 ### DevOps
+
 - Git & GitHub
 - CI/CD with **GitHub Actions** (Analyze)
 
@@ -57,11 +64,13 @@ This project is used as a **training internship project** and demonstrates real-
 ## 🧱 Architecture Overview
 
 This project follows **Clean Architecture** to ensure:
+
 - Separation of concerns
 - Scalability
 - Maintainability
 
 ### Layer Structure
+
 Presentation → Domain → Data
 
 - **Presentation**: UI, Cubit, State
@@ -110,6 +119,7 @@ lib/
 - States are immutable and compared using `Equatable`.
 
 Example:
+
 ```dart
 context.read<TransactionCubit>().loadTransactions();
 ```
@@ -121,6 +131,7 @@ context.read<TransactionCubit>().loadTransactions();
 GitHub Actions is configured to automatically run checks on every push and pull request.
 
 **Current Pipeline:**
+
 - Install dependencies
 - Run flutter analyze
 
@@ -131,6 +142,7 @@ This ensures code quality and prevents breaking changes from being merged.
 ## 🖼 Screenshots
 
 (Add 3–5 screenshots here)
+
 - Login screen
 - Dashboard
 - Add transaction
@@ -142,29 +154,34 @@ This ensures code quality and prevents breaking changes from being merged.
 ## ▶️ How to Run the Project
 
 ### Prerequisites
+
 - Flutter SDK (>= 3.7.x)
 - Supabase project
 
 ### Steps
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/duyphan0503/personal_finance_tracker.git
    cd personal_finance_tracker
    ```
 
 2. Install dependencies:
+
    ```bash
    flutter pub get
    ```
 
 3. Create a `.env` file in the root directory:
+
    ```env
    SUPABASE_URL=your_supabase_url
    SUPABASE_ANON_KEY=your_anon_key
    ```
 
 4. Run the app:
+
    ```bash
    flutter run
    ```
@@ -172,6 +189,7 @@ This ensures code quality and prevents breaking changes from being merged.
 ---
 
 ## 📌 Future Improvements
+
 - Unit & Widget Tests
 - Advanced analytics
 - Offline-first support
@@ -180,7 +198,9 @@ This ensures code quality and prevents breaking changes from being merged.
 ---
 
 ## 👤 Author
-**Phan Bao Duy**
-- Flutter Developer Fresher
+
+**Phan Bao Duy**  
+Flutter Developer Fresher
+
 - [GitHub](https://github.com/duyphan0503)
 - [LinkedIn](https://linkedin.com/in/duyphan0503)

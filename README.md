@@ -141,13 +141,17 @@ This ensures code quality and prevents breaking changes from being merged.
 
 ## 🖼 Screenshots
 
-(Add 3–5 screenshots here)
+| Login Screen | Dashboard |
+|:---:|:---:|
+| <img src="docs/screenshots/login_screen.png" width="250"/> | <img src="docs/screenshots/dashboard_screen.png" width="250"/> |
 
-- Login screen
-- Dashboard
-- Add transaction
-- Budget overview
-- Monthly report chart
+| Add Transaction | Financial Report |
+|:---:|:---:|
+| <img src="docs/screenshots/add_transaction.png" width="250"/> | <img src="docs/screenshots/financial_report.png" width="250"/> |
+
+| Set Budget |
+|:---:|
+| <img src="docs/screenshots/budget_screen.png" width="250"/> |
 
 ---
 

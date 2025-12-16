@@ -177,11 +177,19 @@ This ensures code quality and prevents breaking changes from being merged.
    flutter pub get
    ```
 
-3. Create a `.env` file in the root directory:
+3. Configure Environment Variables:
+
+   Copy the example environment file and rename it to `.env`:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Then open `.env` and fill in your Supabase credentials so it matches the keys in `.env.example`:
 
    ```env
-   SUPABASE_URL=your_supabase_url
-   SUPABASE_ANON_KEY=your_anon_key
+   SUPABASE_URL=your_actual_supabase_url
+   SUPABASE_ANON_KEY=your_actual_supabase_anon_key
    ```
 
 4. Run the app:

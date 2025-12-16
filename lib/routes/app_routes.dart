@@ -74,9 +74,7 @@ class AppRouter {
             path: AppRoutes.addTransaction,
             builder: (context, state) {
               final transaction = state.extra as TransactionModel?;
-              return AddTransactionScreen(
-                transaction: transaction,
-              );
+              return AddTransactionScreen(transaction: transaction);
             },
           ),
           GoRoute(
@@ -116,71 +114,65 @@ class ScaffoldWithBottomNav extends StatelessWidget {
       backgroundColor: Colors.transparent,
       body: Stack(
         children: [
-          SizedBox(height: MediaQuery.of(context).size.height, child: child),
+          Positioned.fill(child: child),
 
           Positioned(
             left: 0,
             right: 0,
             bottom: 0,
             child: Container(
-              height: kBottomNavigationBarHeight + 12,
-              decoration: BoxDecoration(color: Colors.transparent),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: AppColors.tileBorder, width: 1),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.shade100,
-                        blurRadius: 4,
-                        offset: const Offset(0, -2),
+              margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: Border.all(color: AppColors.tileBorder, width: 1),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.shade100,
+                    blurRadius: 4,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: MediaQuery.removePadding(
+                  context: context,
+                  removeBottom: true,
+                  child: BottomNavigationBar(
+                    type: BottomNavigationBarType.fixed,
+                    elevation: 0,
+                    backgroundColor: Colors.white,
+                    selectedFontSize: 10,
+                    unselectedFontSize: 9,
+                    currentIndex: _calculateSelectedIndex(context),
+                    onTap: (index) => _onItemTapped(index, context),
+                    items: const [
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.home),
+                        label: 'Home',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.add),
+                        label: 'Add',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.history),
+                        label: 'History',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.bar_chart),
+                        label: 'Reports',
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.notifications),
+                        label: 'Notif', // Shortened from Notifications
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.settings),
+                        label: 'Settings',
                       ),
                     ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                    ),
-                    child: BottomNavigationBar(
-                      type: BottomNavigationBarType.fixed,
-                      elevation: 0,
-                      backgroundColor: Colors.white,
-                      currentIndex: _calculateSelectedIndex(context),
-                      onTap: (index) => _onItemTapped(index, context),
-                      items: const [
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.home),
-                          label: 'Home',
-                        ),
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.add),
-                          label: 'Add',
-                        ),
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.history),
-                          label: 'History',
-                        ),
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.bar_chart),
-                          label: 'Reports',
-                        ),
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.notifications),
-                          label: 'Notifications',
-                        ),
-                        BottomNavigationBarItem(
-                          icon: Icon(Icons.settings),
-                          label: 'Settings',
-                        ),
-                      ],
-                    ),
                   ),
                 ),
               ),

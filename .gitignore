@@ -123,4 +123,4 @@ app.*.symbols
 .idea/
 
 # Env
-lib/config/env.dart
+.env

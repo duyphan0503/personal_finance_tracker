@@ -34,10 +34,12 @@ class ReportCubit extends Cubit<ReportState> {
         case 'summary':
           final summaryData = _calculateSummaryReport(transactions, filter);
           final categoryData = _calculateCategoryReport(transactions, filter);
-          emit(ReportSummaryLoaded(
-            summaryData: summaryData,
-            categoryData: categoryData,
-          ));
+          emit(
+            ReportSummaryLoaded(
+              summaryData: summaryData,
+              categoryData: categoryData,
+            ),
+          );
           break;
         default:
           emit(const ReportError('Unknown report type'));
@@ -49,28 +51,27 @@ class ReportCubit extends Cubit<ReportState> {
 
   // Group by category, sum amount
   List<CategoryReportItem> _calculateCategoryReport(
-      List<TransactionModel> transactions,
-      Map<String, dynamic> filter,
-      ) {
+    List<TransactionModel> transactions,
+    Map<String, dynamic> filter,
+  ) {
     final Map<String, double> expenseMap = {};
     final Map<String, double> incomeMap = {};
 
     for (final t in transactions) {
-      final cName = t.category?.name ?? 'Uncategorized';
-      final categoryType = t.category?.type ?? CategoryType.expense;
+      final category = t.category;
+      if (category == null) continue;
 
-      if (categoryType == CategoryType.expense) {
+      final cName = category.name;
+      final type = category.type;
+
+      if (type == CategoryType.expense) {
         expenseMap.update(
           cName,
-              (v) => v + t.amount.abs(),
+          (v) => v + t.amount.abs(),
           ifAbsent: () => t.amount.abs(),
         );
       } else {
-        incomeMap.update(
-          cName,
-              (v) => v + t.amount,
-          ifAbsent: () => t.amount,
-        );
+        incomeMap.update(cName, (v) => v + t.amount, ifAbsent: () => t.amount);
       }
     }
 
@@ -81,22 +82,33 @@ class ReportCubit extends Cubit<ReportState> {
       CategoryReportItem(
         title: 'Expense',
         total: totalExpense,
-        items: expenseMap.entries.map((e) => CategoryReportPieItem(
-          name: e.key,
-          value: e.value,
-          percent: totalExpense == 0 ? 0 : e.value / totalExpense * 100,
-          type: 'expense',
-        )).toList(),
+        items:
+            expenseMap.entries
+                .map(
+                  (e) => CategoryReportPieItem(
+                    name: e.key,
+                    value: e.value,
+                    percent:
+                        totalExpense == 0 ? 0 : e.value / totalExpense * 100,
+                    type: 'expense',
+                  ),
+                )
+                .toList(),
       ),
       CategoryReportItem(
         title: 'Income',
         total: totalIncome,
-        items: incomeMap.entries.map((e) => CategoryReportPieItem(
-          name: e.key,
-          value: e.value,
-          percent: totalIncome == 0 ? 0 : e.value / totalIncome * 100,
-          type: 'income',
-        )).toList(),
+        items:
+            incomeMap.entries
+                .map(
+                  (e) => CategoryReportPieItem(
+                    name: e.key,
+                    value: e.value,
+                    percent: totalIncome == 0 ? 0 : e.value / totalIncome * 100,
+                    type: 'income',
+                  ),
+                )
+                .toList(),
       ),
     ];
   }
@@ -167,12 +179,16 @@ class ReportCubit extends Cubit<ReportState> {
   ) {
     double income = 0, expense = 0;
     for (final t in transactions) {
-      if (t.category!.type.name == 'expense') {
+      final type = t.category?.type;
+      if (type == CategoryType.expense) {
         expense += t.amount.abs();
       } else {
         income += t.amount;
       }
     }
+    print(
+      'DEBUG: ReportCubit Summary: inc=$income, exp=$expense, bal=${income - expense}',
+    );
     return SummaryReportData(
       balance: income - expense,
       income: income,

@@ -82,7 +82,10 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
   }
 
   Widget _buildSummaryContent(ReportSummaryLoaded state) {
-    final currencyFormat = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
+    final currencyFormat = NumberFormat.currency(
+      symbol: '\$',
+      decimalDigits: 2,
+    );
 
     return SingleChildScrollView(
       child: Column(
@@ -93,7 +96,10 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
             onTap: () => _selectMonth(context),
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                  horizontal: 16.0,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFFFFD8A4),
                   borderRadius: BorderRadius.circular(8),
@@ -147,7 +153,10 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
             children: [
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20,
+                    horizontal: 16,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEAF6FF),
                     borderRadius: BorderRadius.circular(8),
@@ -182,7 +191,10 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
               const SizedBox(width: 16),
               Expanded(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 20,
+                    horizontal: 16,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFF0DB),
                     borderRadius: BorderRadius.circular(8),
@@ -277,17 +289,14 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
                   ],
                 ),
               );
-            }).toList()
+            })
           else
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 16.0),
               child: Center(
                 child: Text(
                   'No expenses this month',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ),
             ),

@@ -3,11 +3,12 @@
 A mobile application that helps users track daily income, expenses, and manage monthly budgets.
 The project is built with **Flutter (Dart 3)** following **Clean Architecture** and **Cubit (Bloc)** for scalable and maintainable development.
 
-This project is used as a **training internship project** and demonstrates real-world mobile development practices, including authentication, state management, secure storage, charts, and CI/CD.
+This project is used as a **training internship project** and demonstrates real-world mobile development practices, including authentication, state management, secure storage, and charts.
 
 ---
 
 ## 🚀 Features
+
 - 🔐 Authentication with **Supabase Auth (PKCE)**
 - 💰 Income & Expense management (CRUD)
 - 🏷 Category tagging for transactions
@@ -22,56 +23,54 @@ This project is used as a **training internship project** and demonstrates real-
 ## 🛠 Tech Stack
 
 ### Mobile
+
 - **Flutter** (Dart 3)
 - Material 3
 - Responsive UI
 
 ### Architecture & State Management
+
 - Clean Architecture
 - Feature-based structure
-- MVVM principles
 - **Cubit (flutter_bloc)**
 - Equatable
+- DI: **GetIt** & **Injectable**
 
 ### Backend & Networking
+
 - **Supabase**
   - Auth (PKCE)
   - Postgres database
   - Realtime & PostgREST
-- REST API
-- Dio (with interceptors)
+- REST API (via Supabase SDK)
 
 ### Data & Storage
+
 - Flutter Secure Storage (session persistence)
 - shared_preferences
 
 ### UI & Visualization
+
 - fl_chart (reports & analytics)
 - go_router (navigation)
-- Lottie animations
 
-### Logging & Error Handling
-- Structured logging (`logger`)
-- Graceful error handling (try-catch)
+### DevOps
 
-### Testing & DevOps
-- Unit Testing
-- Widget Testing
 - Git & GitHub
-- CI/CD with **GitHub Actions**
-- Flutter Flavors
-- Easy Localization
+- CI/CD with **GitHub Actions** (Analyze)
 
 ---
 
 ## 🧱 Architecture Overview
 
 This project follows **Clean Architecture** to ensure:
+
 - Separation of concerns
-- Testability
 - Scalability
+- Maintainability
 
 ### Layer Structure
+
 Presentation → Domain → Data
 
 - **Presentation**: UI, Cubit, State
@@ -82,26 +81,34 @@ Each feature is isolated to avoid tight coupling and simplify future expansion.
 
 ---
 
-## 📁 Folder Structure
+## 📁 Folder Structure (Feature-First Clean Architecture)
 
+```text
 lib/
-├─ core/
-│ ├─ error/
-│ ├─ network/
-│ ├─ utils/
-│ └─ widgets/
-├─ features/
-│ ├─ auth/
-│ │ ├─ data/
-│ │ ├─ domain/
-│ │ └─ presentation/
-│ ├─ transaction/
-│ ├─ budget/
-│ └─ report/
-├─ app/
-│ ├─ router/
-│ └─ theme/
-└─ main.dart
+├── app/
+│   ├── router/
+│   └── theme/
+├── config/
+├── features/
+│   ├── auth/
+│   │   ├── data/
+│   │   ├── domain/
+│   │   └── presentation/
+│   ├── budget/
+│   ├── category/
+│   ├── dashboard/
+│   ├── report/
+│   ├── settings/
+│   └── transaction/
+├── gen/
+├── shared/
+│   ├── services/
+│   ├── utils/
+│   └── widgets/
+├── app.dart
+├── injection.dart
+└── main.dart
+```
 
 ---
 
@@ -112,56 +119,100 @@ lib/
 - States are immutable and compared using `Equatable`.
 
 Example:
+
 ```dart
 context.read<TransactionCubit>().loadTransactions();
 ```
-🧪 Testing
-The project includes basic unit and widget tests to:
-    • Validate business logic
-    • Ensure safe refactoring
-    • Prevent regressions
-Test structure:
-test/
- ├─ transaction/
- │   └─ transaction_cubit_test.dart
- ├─ budget/
- │   └─ budget_cubit_test.dart
-⚙️ CI/CD
+
+---
+
+## ⚙️ CI/CD
+
 GitHub Actions is configured to automatically run checks on every push and pull request.
-Current Pipeline
-    • Install dependencies
-    • Run flutter analyze
+
+**Current Pipeline:**
+
+- Install dependencies
+- Run flutter analyze
+
 This ensures code quality and prevents breaking changes from being merged.
-🖼 Screenshots
-(Add 3–5 screenshots here)
-    • Login screen
-    • Transaction list
-    • Add transaction
-    • Budget overview
-    • Monthly report chart
 
-▶️ How to Run the Project
-Prerequisites
-    • Flutter SDK (>= 3.x)
-    • Supabase project
-Steps
-git clone https://github.com/duyphan0503/personal_finance_tracker.git
-cd personal_finance_tracker
-flutter pub get
-Create a .env file:
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_anon_key
-Run the app:
-flutter run
-📌 Future Improvements
-    • Refresh token handling
-    • Offline-first support
-    • Golden tests for UI
-    • Advanced analytics
-    • App release pipeline (Codemagic)
+---
 
-👤 Author
-Phan Bao Duy
+## 🖼 Screenshots
+
+| Login Screen | Dashboard |
+|:---:|:---:|
+| <img src="docs/screenshots/login_screen.png" width="250"/> | <img src="docs/screenshots/dashboard_screen.png" width="250"/> |
+
+| Add Transaction | Financial Report |
+|:---:|:---:|
+| <img src="docs/screenshots/add_transaction.png" width="250"/> | <img src="docs/screenshots/financial_report.png" width="250"/> |
+
+| Set Budget |
+|:---:|
+| <img src="docs/screenshots/budget_screen.png" width="250"/> |
+
+---
+
+## ▶️ How to Run the Project
+
+### Prerequisites
+
+- Flutter SDK (>= 3.7.x)
+- Supabase project
+
+### Steps
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/duyphan0503/personal_finance_tracker.git
+   cd personal_finance_tracker
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   flutter pub get
+   ```
+
+3. Configure Environment Variables:
+
+   Copy the example environment file and rename it to `.env`:
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Then open `.env` and fill in your Supabase credentials so it matches the keys in `.env.example`:
+
+   ```env
+   SUPABASE_URL=your_actual_supabase_url
+   SUPABASE_ANON_KEY=your_actual_supabase_anon_key
+   ```
+
+4. Run the app:
+
+   ```bash
+   flutter run
+   ```
+
+---
+
+## 📌 Future Improvements
+
+- Unit & Widget Tests
+- Advanced analytics
+- Offline-first support
+- Dark mode toggle
+
+---
+
+## 👤 Author
+
+**Phan Bao Duy**  
 Flutter Developer Fresher
-    • GitHub: https://github.com/duyphan0503
-    • LinkedIn: https://linkedin.com/in/duyphan0503
+
+- [GitHub](https://github.com/duyphan0503)
+- [LinkedIn](https://linkedin.com/in/duyphan0503)

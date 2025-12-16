@@ -24,7 +24,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
   void _loadSettings() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _transactionReminderEnabled = prefs.getBool('transactionReminder') ?? true;
+      _transactionReminderEnabled =
+          prefs.getBool('transactionReminder') ?? true;
       _budgetLimitEnabled = prefs.getBool('budgetLimit') ?? false;
       _tipRecommendationsEnabled = prefs.getBool('tipRecommendations') ?? true;
     });
@@ -53,19 +54,13 @@ class _NotificationScreenState extends State<NotificationScreen> {
               children: [
                 const Text(
                   'No budgets set',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 const Text(
                   'You haven\'t set a budget for any\ncategories. Would you like to set\none now?',
-                  style: TextStyle(
-                    fontSize: 15,
-                    height: 1.5,
-                  ),
+                  style: TextStyle(fontSize: 15, height: 1.5),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
@@ -77,7 +72,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         onPressed: () {
                           Navigator.pop(context); // Close dialog
                           setState(() {
-                            _budgetLimitEnabled = false; // Keep switch off if canceled
+                            _budgetLimitEnabled =
+                                false; // Keep switch off if canceled
                           });
                         },
                         style: TextButton.styleFrom(
@@ -85,10 +81,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         ),
                         child: const Text(
                           'Cancel',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
+                          style: TextStyle(fontSize: 16, color: Colors.black),
                         ),
                       ),
                     ),
@@ -117,7 +110,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 _budgetLimitEnabled = true;
                               });
                               _saveSettings();
-                              NotificationService.showSuccess('Budget limit notifications enabled');
+                              NotificationService.showSuccess(
+                                'Budget limit notifications enabled',
+                              );
                             } else {
                               // If result is 'false', keep switch off
                               setState(() {
@@ -128,9 +123,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         },
                         child: const Text(
                           'Set Budget',
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
+                          style: TextStyle(fontSize: 16),
                         ),
                       ),
                     ),
@@ -147,10 +140,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notifications'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('Notifications'), centerTitle: true),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -177,9 +167,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
               });
               _saveSettings();
               NotificationService.showSuccess(
-                  value
-                      ? 'Transaction reminders enabled'
-                      : 'Transaction reminders disabled');
+                value
+                    ? 'Transaction reminders enabled'
+                    : 'Transaction reminders disabled',
+              );
             },
           ),
           const SizedBox(height: 16),
@@ -198,7 +189,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   _budgetLimitEnabled = false;
                 });
                 _saveSettings();
-                NotificationService.showSuccess('Budget limit notifications disabled');
+                NotificationService.showSuccess(
+                  'Budget limit notifications disabled',
+                );
               }
             },
           ),
@@ -214,9 +207,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
               });
               _saveSettings();
               NotificationService.showSuccess(
-                  value
-                      ? 'Tip & Recommendations enabled'
-                      : 'Tip & Recommendations disabled');
+                value
+                    ? 'Tip & Recommendations enabled'
+                    : 'Tip & Recommendations disabled',
+              );
             },
           ),
         ],
@@ -243,27 +237,21 @@ class _NotificationScreenState extends State<NotificationScreen> {
           children: [
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
               description,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
             ),
           ],
         ),
         value: value,
         onChanged: onChanged,
-        activeColor: const Color(0xFFFFFFFF),
+        activeThumbColor: const Color(0xFFFFFFFF),
         inactiveThumbColor: Colors.white,
         inactiveTrackColor: Colors.grey.shade300,
-        activeTrackColor: const Color(0xFFFF8915).withOpacity(0.5),
+        activeTrackColor: const Color(0xFFFF8915).withValues(alpha: 0.5),
       ),
     );
   }

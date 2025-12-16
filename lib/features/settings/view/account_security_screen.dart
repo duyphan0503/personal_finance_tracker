@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:personal_finance_tracker/features/auth/cubit/auth_cubit.dart';
 import 'package:personal_finance_tracker/routes/app_routes.dart';
@@ -29,7 +28,11 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
       appBar: AppBar(
         title: const Text(
           'Account & Security',
-          style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -87,15 +90,15 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          vertical: 12,
+          horizontal: 16,
+        ),
         leading: Padding(
           padding: const EdgeInsets.only(right: 8),
           child: Icon(icon, color: iconColor),
         ),
-        title: Text(
-          title,
-          style: style,
-        ),
+        title: Text(title, style: style),
         onTap: onTap,
         horizontalTitleGap: 0,
       ),
@@ -107,15 +110,10 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFFF8915), // Màu cam
         padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       onPressed: () => _handleLogout(context),
-      child: const Text(
-        'Log Out',
-        style: TextStyle(fontSize: 16),
-      ),
+      child: const Text('Log Out', style: TextStyle(fontSize: 16)),
     );
   }
 
@@ -138,27 +136,28 @@ class _AccountSecurityScreenState extends State<AccountSecurityScreen> {
   void _handleLogout(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Log Out'),
-        content: const Text('Are you sure you want to log out?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Log Out'),
+            content: const Text('Are you sure you want to log out?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _authCubit.signOut();
+                  context.go(AppRoutes.signIn);
+                },
+                child: const Text(
+                  'Log Out',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _authCubit.signOut();
-              context.go(AppRoutes.signIn);
-            },
-            child: const Text(
-              'Log Out',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

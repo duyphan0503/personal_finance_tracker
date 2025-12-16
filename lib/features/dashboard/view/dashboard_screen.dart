@@ -19,13 +19,11 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  late final DashboardCubit _dashboardCubit;
   late final CategoryCubit _categoryCubit;
 
   @override
   void initState() {
     super.initState();
-    _dashboardCubit = getIt<DashboardCubit>();
     _categoryCubit = getIt<CategoryCubit>();
     context.read<DashboardCubit>().loadDashboardData();
   }

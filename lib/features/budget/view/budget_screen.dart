@@ -134,18 +134,25 @@ class _BudgetScreenState extends State<BudgetScreen> {
       return;
     }
 
-    context
-        .read<BudgetCubit>()
-        .saveBudget(amount, _selectedCategory!.id)
-        .then((_) {
-      NotificationService.showSuccess('Budget saved successfully!');
-      Navigator.pop(context, true); // Trả về true cho NotificationScreen
-    })
-        .catchError((e) {
-      NotificationService.showError('Failed to save budget: $e');
-    });
+    _saveBudgetAsync(amount);
   }
 
+  Future<void> _saveBudgetAsync(double amount) async {
+    try {
+      await context.read<BudgetCubit>().saveBudget(
+        amount,
+        _selectedCategory!.id,
+      );
+      if (mounted) {
+        NotificationService.showSuccess('Budget saved successfully!');
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      if (mounted) {
+        NotificationService.showError('Failed to save budget: $e');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

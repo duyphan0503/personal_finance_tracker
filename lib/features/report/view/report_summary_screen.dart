@@ -46,9 +46,7 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
               onPrimary: Colors.white, // header text color
               onSurface: Color(0xFF0D1B3D), // body text color
             ),
-            dialogTheme: DialogTheme(
-              backgroundColor: Colors.white,
-            ),
+            dialogTheme: DialogThemeData(backgroundColor: Colors.white),
           ),
           child: child!,
         );
@@ -92,12 +90,10 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
   List<_ExpenseItem> _getTopExpenses(List<CategoryReportItem> categoryData) {
     try {
       final expenseCategory = categoryData.firstWhere(
-            (item) => item.title == 'Expense',
-        orElse: () => const CategoryReportItem(
-          title: 'Expense',
-          total: 0,
-          items: [],
-        ),
+        (item) => item.title == 'Expense',
+        orElse:
+            () =>
+                const CategoryReportItem(title: 'Expense', total: 0, items: []),
       );
 
       // Group items by name and sum their values
@@ -105,30 +101,36 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
       for (final item in expenseCategory.items) {
         expenseMap.update(
           item.name,
-              (value) => value + item.value,
+          (value) => value + item.value,
           ifAbsent: () => item.value,
         );
       }
 
       // Convert to list and sort by value descending
-      final sortedEntries = expenseMap.entries.toList()
-        ..sort((a, b) => b.value.compareTo(a.value));
+      final sortedEntries =
+          expenseMap.entries.toList()
+            ..sort((a, b) => b.value.compareTo(a.value));
 
       // Take top 3 and map to _ExpenseItem
-      return sortedEntries.take(3).map((entry) => _ExpenseItem(
-        entry.key,
-        entry.value,
-        _categoryCubit.getCategoryIcon(entry.key),
-      )).toList();
+      return sortedEntries
+          .take(3)
+          .map(
+            (entry) => _ExpenseItem(
+              entry.key,
+              entry.value,
+              _categoryCubit.getCategoryIcon(entry.key),
+            ),
+          )
+          .toList();
     } catch (e) {
       return [];
     }
   }
 
   Widget _buildSummaryContent(
-      SummaryReportData data,
-      List<_ExpenseItem> topExpenses,
-      ) {
+    SummaryReportData data,
+    List<_ExpenseItem> topExpenses,
+  ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Column(
@@ -290,10 +292,7 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
         if (topExpenses.isEmpty)
           const Text(
             "No expenses this month",
-            style: TextStyle(
-              color: Color(0xFF0D1B3D),
-              fontSize: 16,
-            ),
+            style: TextStyle(color: Color(0xFF0D1B3D), fontSize: 16),
           )
         else
           ...topExpenses.map((e) => _buildExpenseItem(e)),
@@ -306,7 +305,11 @@ class _ReportSummaryScreenState extends State<ReportSummaryScreen> {
       padding: const EdgeInsets.symmetric(vertical: 7),
       child: Row(
         children: [
-          Icon(item.icon, color: _categoryCubit.getCategoryIconColor(item.name), size: 28),
+          Icon(
+            item.icon,
+            color: _categoryCubit.getCategoryIconColor(item.name),
+            size: 28,
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
